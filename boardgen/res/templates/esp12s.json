@@ -1,0 +1,83 @@
+{
+	"name": "esp12s",
+	"title": "ESP-12S form factor",
+	"width": 16,
+	"height": 24,
+	"front": [
+		{
+			"comment": "PCB soldermask",
+			"type": "rect",
+			"pos": "0,0",
+			"size": "16,24",
+			"preset": "${MASK_PRESET}"
+		},
+		{
+			"comment": "Pins (1-8)",
+			"id": "left",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "0,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "left"
+			}
+		},
+		{
+			"comment": "Pins (9-16)",
+			"id": "right",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "16,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "right"
+			}
+		}
+	],
+	"back": [
+		{
+			"comment": "PCB soldermask",
+			"type": "rect",
+			"pos": "0,0",
+			"size": "16,24",
+			"preset": "${MASK_PRESET}"
+		},
+		{
+			"comment": "Pins (9-16)",
+			"id": "right",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "0,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "left"
+			}
+		},
+		{
+			"comment": "Pins (1-8)",
+			"id": "left",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "16,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "right"
+			}
+		}
+	],
+	"pads": {
+		"1": "esp12s.front.left.pin1",
+		"2": "esp12s.front.left.pin2",
+		"3": "esp12s.front.left.pin3",
+		"4": "esp12s.front.left.pin4",
+		"5": "esp12s.front.left.pin5",
+		"6": "esp12s.front.left.pin6",
+		"7": "esp12s.front.left.pin7",
+		"8": "esp12s.front.left.pin8",
+		"9": "esp12s.front.right.pin8",
+		"10": "esp12s.front.right.pin7",
+		"11": "esp12s.front.right.pin6",
+		"12": "esp12s.front.right.pin5",
+		"13": "esp12s.front.right.pin4",
+		"14": "esp12s.front.right.pin3",
+		"15": "esp12s.front.right.pin2",
+		"16": "esp12s.front.right.pin1"
+	},
+	"test_pads": {}
+}

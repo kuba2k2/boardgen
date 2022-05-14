@@ -1,0 +1,10 @@
+{
+	"boot_xip": "Boot XIP",
+	"boot_ram": "Boot RAM",
+	"system": "System Data",
+	"calibration": "Calibration",
+	"ota1": "OTA1 Image",
+	"ota2": "OTA2 Image",
+	"userdata": "User Data",
+	"rdp": "RDP"
+}

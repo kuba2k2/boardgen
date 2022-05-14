@@ -1,0 +1,82 @@
+{
+	"ADC": {
+		"title": "Analog-to-Digital Converter",
+		"color": "#8AD039"
+	},
+	"ARD_A": {
+		"title": "Arduino Analog pin",
+		"color": "#16A352",
+		"ratio": 1.5
+	},
+	"ARD_D": {
+		"title": "Arduino Digital pin",
+		"color": "#99188D",
+		"ratio": 1.5
+	},
+	"CTRL": {
+		"title": "Control pin",
+		"color": "#ED602E"
+	},
+	"GPIO": {
+		"title": "GPIO",
+		"color": "#800000"
+	},
+	"I2C": {
+		"title": "I2C bus",
+		"color": "#FF9955"
+	},
+	"I2S": {
+		"title": "I2S peripheral",
+		"color": "#FF8080"
+	},
+	"IO": {
+		"title": "Input/Output",
+		"color": "#4E4C4C",
+		"ratio": 1.8
+	},
+	"JTAG": {
+		"title": "JTAG interface",
+		"color": "#FFE680"
+	},
+	"PHYSICAL": {
+		"title": "Physical pin",
+		"color": "#4E4C4C",
+		"ratio": 1
+	},
+	"PWM": {
+		"title": "PWM output",
+		"color": "#AFA35E"
+	},
+	"PWR": {
+		"title": "Power pin",
+		"color": "#CD3C24"
+	},
+	"GND": {
+		"title": "Ground",
+		"color": "#000000"
+	},
+	"SD": {
+		"title": "SD card interface",
+		"color": "#F4DE51"
+	},
+	"SPI": {
+		"title": "SPI bus",
+		"color": "#E9BA33"
+	},
+	"SWD": {
+		"title": "SWD interface",
+		"color": "#FFE680"
+	},
+	"TMR": {
+		"title": "",
+		"color": "#DD913C"
+	},
+	"UART": {
+		"title": "UART I/O",
+		"color": "#DCD4EE"
+	},
+	"WAKE": {
+		"title": "",
+		"color": "#CF90B3"
+	}
+}
