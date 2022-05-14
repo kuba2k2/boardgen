@@ -10,24 +10,6 @@ from ..base import LabelShape
 from .block import Block
 from .io_line import IOLine
 
-roles_idxswap = [
-    RoleType.UART,
-    RoleType.SPI,
-    RoleType.I2C,
-    RoleType.I2S,
-    RoleType.TMR,
-]
-roles_nameidx = [
-    RoleType.ADC,
-    RoleType.PWM,
-    RoleType.WAKE,
-]
-roles_arduino = [
-    RoleType.ARD,
-    RoleType.ARD_D,
-    RoleType.ARD_A,
-]
-
 
 class Label(LabelShape):
     roles: dict[RoleType, RoleValue]
@@ -65,74 +47,41 @@ class Label(LabelShape):
             (RoleType.PHYSICAL, str(pin)),
         ]
 
-        for role_type, values in self.roles.items():
-            # force a list
-            if not isinstance(values, list):
-                values = [str(values)]
-
-            for text in values:
-                # skip hidden texts
-                if role_type in roles_idxswap and text[0].isnumeric():
-                    if text[2:] in hidden:
-                        continue
-                    text = text[2:] + text[0]
-                # append role name to number
-                elif role_type in roles_nameidx and text.isnumeric():
-                    text = role_type.name + text
-                # SWDIO / SWCLK
-                elif role_type == RoleType.SWD:
-                    text = "SW" + text
-                # convert voltage
-                elif role_type == RoleType.PWR and text.replace(".", "").isnumeric():
-                    text = float(text)
-                    if text == 0.0:
-                        role_type = RoleType.GND
-                        text = "GND"
-                    elif int(text) == text:
-                        text = f"{int(text)}V"
-                    else:
-                        text = str(text).replace(".", "V")
-                # change Arduino A0/D0 to roles
-                elif role_type in roles_arduino:
-                    role_type = RoleType.ARD_D if text[0] == "D" else RoleType.ARD_A
-                # remove hidden roles
-                if role_type.name in hidden or text in hidden:
-                    continue
-                labels.append((role_type, text))
-
         # sort labels according to enum sorting
         role_types = list(RoleType)
-        labels = sorted(labels, key=lambda x: role_types.index(x[0]))
+        roles = sorted(self.roles.items(), key=lambda x: role_types.index(x[0]))
 
         # build label shapes
         pos = V(self.pos)
-        for role_type, text in labels:
+        for role_type, functions in roles:
             if role_type not in core.roles:
                 continue
             role: Role = core.roles[role_type]
-            params = dict(
-                pos=V(pos),
-                label_dir=pad.label_dir,
-                label_size=pad.label_size,
-                role_type=role_type,
-                ratio=role.ratio,
-                color=role.color,
-            )
-            match role_type:
-                case RoleType.IO:
-                    shape = IOLine(
-                        **params,
-                        type=IOType(text),
-                        **io_extra,
-                    )
-                case _:
-                    shape = Block(
-                        **params,
-                        text=text,
-                        **block_extra,
-                    )
-            pos.x += (shape.width + shape.padding.x * 2) * shape.dirv
-            self.labels.append(shape)
+            texts = role.format(functions, hidden=hidden)
+            for text in texts:
+                params = dict(
+                    pos=V(pos),
+                    label_dir=pad.label_dir,
+                    label_size=pad.label_size,
+                    role_type=role_type,
+                    ratio=role.ratio,
+                    color=role.color,
+                )
+                match role_type:
+                    case RoleType.IO:
+                        shape = IOLine(
+                            **params,
+                            type=IOType(text),
+                            **io_extra,
+                        )
+                    case _:
+                        shape = Block(
+                            **params,
+                            text=text,
+                            **block_extra,
+                        )
+                pos.x += (shape.width + shape.padding.x * 2) * shape.dirv
+                self.labels.append(shape)
 
     def move(self, vec: V):
         self.pos += vec

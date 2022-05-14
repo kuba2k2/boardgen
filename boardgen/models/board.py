@@ -7,16 +7,20 @@ from .pcb import Pcb
 
 class Board(Model):
     build: "BoardBuild"
-    connectivity: list[str]
-    debug: "BoardDebug"
-    doc: "BoardDoc"
-    flash: list[FlashRegion]
+    connectivity: list[str] = None
+    debug: "BoardDebug" = None
+    doc: "BoardDoc" = None
+    flash: list[FlashRegion] = None
     frameworks: list[str]
     name: str
-    pcb: Pcb
+    pcb: Pcb = None
     upload: "BoardUpload"
-    url: str
+    url: str = None
     vendor: str
+
+    @property
+    def id(self) -> str:
+        return self.build.variant
 
     @property
     def size_flash(self) -> str:
@@ -49,23 +53,25 @@ class BoardDebug(Model):
 
 
 class BoardDoc(Model):
-    params: "BoardDocParams"
+    params: "BoardDocParams" = None
+    links: dict[str, str] = None
+    extra: list[str] = None
 
 
 class BoardDocParams(Model):
-    extra: dict[str, str]
-    manufacturer: str
-    series: str
-    voltage: str
+    extra: dict[str, str] = None
+    manufacturer: str = None
+    series: str = None
+    voltage: str = None
 
 
 class BoardUpload(Model):
     flash_size: int
     maximum_ram_size: int
     maximum_size: int
-    protocol: str
-    protocols: list[str]
-    speed: int
+    protocol: str = None
+    protocols: list[str] = None
+    speed: int = None
 
 
 Board.update_forward_refs()

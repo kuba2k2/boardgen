@@ -17,7 +17,10 @@ class CoreGetters(ABC):
     def roles(self) -> dict[RoleType, Role]:
         if not self._roles:
             roles = load_json(self._file_roles)
-            self._roles = {RoleType(key): Role(**value) for key, value in roles.items()}
+            self._roles = {
+                RoleType(key): Role(role_type=RoleType(key), **value)
+                for key, value in roles.items()
+            }
         return self._roles
 
     @property

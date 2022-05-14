@@ -2,15 +2,12 @@
 
 import json
 import re
-from glob import glob
 from importlib.metadata import version
-from os.path import basename, dirname, join
+from os.path import dirname, isfile, join
 
-from genericpath import isfile
-from svgwrite import Drawing
-
-from ..mixins import HasId, HasVars, ParentType
+from ..mixins import HasId, ParentType
 from ..models import Board, FlashRegion, Pcb, Role, RoleType, ShapeType, Side, Template
+from ..models.enums import RoleValue
 from ..shapes.base import Shape
 from ..shapes.circle import Circle
 from ..shapes.group import ShapeGroup
@@ -149,6 +146,31 @@ class Core(CoreCache, CoreGetters):
             name (str): Board name.
         """
         manifest = self.load_board(name)
+
+        if "pcb" in manifest and "pinout" in manifest["pcb"]:
+            for roles in manifest["pcb"]["pinout"].values():
+                roles: dict[str, RoleValue]
+                for role_type, functions in dict(roles).items():
+                    if role_type == "ARD":
+                        digital = []
+                        analog = []
+                        if not isinstance(functions, list):
+                            functions = [str(functions)]
+                        for function in functions:
+                            match function[0]:
+                                case "D":
+                                    digital.append(function)
+                                case "A":
+                                    analog.append(function)
+                        if digital:
+                            if len(digital) != 1:
+                                raise ValueError(f"Invalid digital pins: {digital}")
+                            roles["ARD_D"] = digital[0]
+                        if analog:
+                            if len(analog) != 1:
+                                raise ValueError(f"Invalid analog pins: {analog}")
+                            roles["ARD_A"] = analog[0]
+                        roles.pop("ARD", None)
 
         if "flash" in manifest and isinstance(manifest["flash"], dict):
             flash: list[FlashRegion] = []

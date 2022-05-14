@@ -3,6 +3,7 @@
 from . import models, shapes, utils
 from .core import Core
 from .mixins import HasId, HasVars, ParentType
+from .readme import ReadmeWriter
 from .vector import V
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "HasId",
     "ParentType",
     "V",
+    "ReadmeWriter",
 ]

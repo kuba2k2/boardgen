@@ -11,6 +11,7 @@ from svgwrite import Drawing, shapes
 
 from . import Core
 from .models import Board, Side, Template
+from .readme.writer import ReadmeWriter
 from .shapes.label import Label
 from .utils import load_json
 from .vector import V
@@ -59,6 +60,7 @@ def cli(
 @click.argument("boards", nargs=-1, required=True)
 @click.option("--dump", "-d", is_flag=True, help="Dump board info and exit")
 @click.option("--output", "-o", default=".", help="Output directory")
+@click.option("--subdir", "-O", is_flag=True, help="Output into per-board subdirectory")
 @click.option("--width", "-w", default=1024, help="Image width (px)")
 @click.option("--height", "-h", default=500, help="Image height (px)")
 @click.option(
@@ -77,9 +79,10 @@ def cli(
 @click.pass_context
 def draw(
     ctx,
-    boards: str,
+    boards: list[str],
     dump: bool,
     output: str,
+    subdir: bool,
     width: int,
     height: int,
     scale: float,
@@ -144,10 +147,42 @@ def draw(
                 label.draw(dwg)
                 label.move(-pcb_pos)
 
-        with open(
-            join(output, f"{board.build.variant}.svg"), "w", encoding="utf-8"
-        ) as f:
+        svg = join(output, f"{board.id}.svg")
+        if subdir:
+            os.makedirs(join(output, board.id), exist_ok=True)
+            svg = join(output, board.id, f"pinout_{board.id}.svg")
+        with open(svg, "w", encoding="utf-8") as f:
             dwg.write(f, pretty=True, indent=4)
+
+
+@cli.command()
+@click.argument("boards", nargs=-1, required=True)
+@click.option("--output", "-o", default=".", help="Output directory")
+@click.option("--subdir", "-O", is_flag=True, help="Output into per-board subdirectory")
+def write(
+    boards: list[str],
+    output: str,
+    subdir: bool,
+):
+    """Write board README.md"""
+    boards = [
+        echo(f"Loading board '{board}'...") or core.get_board(board) for board in boards
+    ]
+
+    if output:
+        os.makedirs(output, exist_ok=True)
+
+    for board in boards:
+        board: Board
+        readme = ReadmeWriter(core)
+        readme.write(board=board)
+
+        md = join(output, f"{board.id}.md")
+        if subdir:
+            md = join(output, board.id, f"README.md")
+
+        echo(f"Saving to '{md}'...")
+        readme.save(md)
 
 
 @cli.group(name="list")

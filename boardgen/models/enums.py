@@ -31,7 +31,6 @@ class RoleType(Enum):
     GPIO = "GPIO"
     ADC = "ADC"
 
-    ARD = "ARD"
     ARD_D = "ARD_D"
     ARD_A = "ARD_A"
 
