@@ -45,14 +45,14 @@ jobs:
       run: poetry build
     - name: Publish to PyPI
       run: poetry publish -u __token__ -p ${{ secrets.PYPI_TOKEN }}
-    - name: Add GitHub release assets
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          dist/*.whl
-          dist/*.tar.gz
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Add GitHub release assets
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: |
+    #       dist/*.whl
+    #       dist/*.tar.gz
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload workflow artifact
       uses: actions/upload-artifact@v3
       with:
