@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "boardgen"
-version = "0.2.0"
+version = "0.2.1"
 description = "Board pinout diagram generator"
 authors = ["Kuba Szczodrzyński <kuba@szczodrzynski.pl>"]
 license = "MIT"
