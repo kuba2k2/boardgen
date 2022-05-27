@@ -6,5 +6,7 @@
 	"ota1": "OTA1 Image",
 	"ota2": "OTA2 Image",
 	"userdata": "User Data",
-	"rdp": "RDP"
+	"rdp": "RDP",
+	"kvs": "Key-Value Store",
+	"nvs": "NVS"
 }
