@@ -126,6 +126,11 @@ class ReadmeWriter(ReadmeParts):
                         [
                             num,
                             analog[num],
+                            [],
+                            [],
+                            [],
+                            [],
+                            [],
                         ]
                     )
                 for i, row in enumerate(rows):
