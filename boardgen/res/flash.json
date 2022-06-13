@@ -8,5 +8,9 @@
 	"userdata": "User Data",
 	"rdp": "RDP",
 	"kvs": "Key-Value Store",
-	"nvs": "NVS"
+	"nvs": "NVS",
+	"bootloader": "Bootloader",
+	"app": "App Image",
+	"download": "OTA Image",
+	"unknown": "Unknown"
 }
