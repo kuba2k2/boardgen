@@ -8,6 +8,7 @@ from click import echo
 from click.core import Context
 from devtools import debug
 from svgwrite import Drawing, shapes
+from svgwrite.utils import AutoID
 
 from . import Core
 from .models import Board, Side, Template
@@ -103,34 +104,62 @@ def draw(
     if output:
         os.makedirs(output, exist_ok=True)
 
+    sides = [Side.FRONT, Side.BACK]
+
+    scale_arg = scale
+
     for board in boards:
         board: Board
         echo(f"Drawing '{board.name}'...")
 
         pcb = board.pcb
-        (pcb_pos1, pcb_pos2) = pcb.get_pos(Side.FRONT)
-        pcb_size = pcb_pos2 - pcb_pos1
-        if labels:
-            (labels_list, labels_pos1, labels_pos2) = core.build_labels(pcb)
-            # labels_size = labels_pos2 - labels_pos1
+        images = []
+
+        AutoID._set_value(1)
+        dwg = Drawing(size=px_size.tuple)
+
+        scale = scale_arg
+        if pcb.scale and pcb.scale < scale:
+            scale = pcb.scale
+
+        for side in sides:
+            try:
+                (pcb_pos1, pcb_pos2) = pcb.get_pos(side)
+            except ValueError:
+                continue
+            labels_list = []
+            size = pcb_pos2 - pcb_pos1
+            pos1 = pcb_pos1
+            if labels:
+                (labels_list, labels_pos1, labels_pos2) = core.build_labels(pcb, side)
+                if labels_list:
+                    pos1 = V(
+                        min(pcb_pos1.x, labels_pos1.x), min(pcb_pos1.y, labels_pos1.y)
+                    )
+                    pos2 = V(
+                        max(pcb_pos2.x, labels_pos2.x), max(pcb_pos2.y, labels_pos2.y)
+                    )
+                    size = pos2 - pos1
+                else:
+                    continue
+            images += [
+                (side, pos1, size, labels_list),
+            ]
+
+        # stack horizontally
+        part_size = V(px_size.x / len(images), px_size.y)
+        part_pos = [V(part_size.x * i, 0) for i in range(len(images))]
 
         if scale:
             vb_size = px_size / scale
         else:
-            size_pad = px_size * 0.90  # 5% padding from each side
-            if labels:
-                pos1 = V(min(pcb_pos1.x, labels_pos1.x), min(pcb_pos1.y, labels_pos1.y))
-                pos2 = V(max(pcb_pos2.x, labels_pos2.x), max(pcb_pos2.y, labels_pos2.y))
-                size = pos2 - pos1
-            else:
-                size = pcb_size
-            scale_auto = min(size_pad.x / size.x, size_pad.y / size.y)
-            echo(" - calculated scale: %.2f" % scale_auto)
-            vb_size = px_size / scale_auto
+            scale = 99999
+            size_pad = part_size * 0.90  # 5% padding from each side
+            for (_, _, size, _) in images:
+                scale = min(scale, size_pad.x / size.x, size_pad.y / size.y)
+            echo(" - calculated scale: %.2f" % scale)
+            vb_size = px_size / scale
 
-        pcb_pos = (vb_size - pcb_size) / 2
-
-        dwg = Drawing(size=px_size.tuple)
         dwg.viewbox(width=vb_size.x, height=vb_size.y)
 
         if canvas:
@@ -139,13 +168,19 @@ def draw(
             bg.stroke(color="black", width=0.1)
             dwg.add(bg)
 
-        pcb.draw(dwg, Side.FRONT, pcb_pos)
-        if labels:
-            for label in labels_list:
-                label: Label
-                label.move(pcb_pos)
-                label.draw(dwg)
-                label.move(-pcb_pos)
+        for i, (side, pos1, size, labels_list) in enumerate(images):
+            pcb_pos = ((part_size / scale) - size) / 2
+            pcb_pos += part_pos[i] / scale
+            pcb_pos -= pos1
+            if canvas:
+                pcb_pos.x -= 0.05
+            pcb.draw(dwg, side, pcb_pos)
+            if labels:
+                for label in labels_list:
+                    label: Label
+                    label.move(pcb_pos)
+                    label.draw(dwg)
+                    label.move(-pcb_pos)
 
         svg = join(output, f"{board.id}.svg")
         if subdir:

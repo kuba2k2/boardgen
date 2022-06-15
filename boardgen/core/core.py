@@ -239,7 +239,7 @@ class Core(CoreCache, CoreGetters):
 
         return board
 
-    def build_labels(self, pcb: Pcb) -> tuple[list[Label], V, V]:
+    def build_labels(self, pcb: Pcb, side: Side) -> tuple[list[Label], V, V]:
         pads = pcb.pads
         pads |= pcb.test_pads
         pins = pcb.pinout
@@ -248,7 +248,11 @@ class Core(CoreCache, CoreGetters):
         x1, y1, x2, y2 = (None, None, None, None)
         labels: list[Label] = []
         for pin, roles in pins.items():
-            pad = pcb.pad_by_id(id=pads[pin])
+            if pin not in pads:
+                continue
+            pad = pcb.shapes[side].get_by_id(pads[pin])
+            if not pad:
+                continue
             label = Label(
                 pos=pad.pos,
                 role_type=RoleType.NC,
