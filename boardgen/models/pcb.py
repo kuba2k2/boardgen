@@ -2,21 +2,25 @@
 
 from svgwrite import Drawing
 
-from ..mixins import HasVars
+from ..mixins import HasId, HasVars
 from ..shapes import Shape, ShapeGroup
 from ..utils import Model
 from ..vector import V
 from .enums import RoleType, Side
 
+PinDict = dict[RoleType, list[str] | str | int | float | None]
 
-class Pcb(Model, HasVars):
+
+class Pcb(Model, HasId, HasVars):
     symbol: str
     templates: list[str]
-    front: list[dict] = {}
-    back: list[dict] = {}
+    scale: float = 0
+    ic: dict[int, PinDict] = {}
+    front: list[dict] = []
+    back: list[dict] = []
     pads: dict[str, str] = {}
     test_pads: dict[str, str] = {}
-    pinout: dict[str, dict[RoleType, list[str] | str | int | float | None]] = {}
+    pinout: dict[str, PinDict] = {}
     pinout_hidden: str = ""
 
     shapes: dict[Side, ShapeGroup] = {}

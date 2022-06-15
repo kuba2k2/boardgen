@@ -146,10 +146,18 @@ class Core(CoreCache, CoreGetters):
             name (str): Board name.
         """
         manifest = self.load_board(name)
+        pcb = manifest.get("pcb", None)
+        pinout = pcb.get("pinout", None) if pcb else None
+        ic_pins = pcb.get("ic", None) if pcb else None
 
-        if "pcb" in manifest and "pinout" in manifest["pcb"]:
-            for roles in manifest["pcb"]["pinout"].values():
+        if pinout:
+            for roles in pinout.values():
                 roles: dict[str, RoleValue]
+                # add IC pinout mapping from board manifest
+                ic_pin = str(roles.get("IC", None))
+                if ic_pins and ic_pin in ic_pins:
+                    roles |= ic_pins[ic_pin]
+
                 for role_type, functions in dict(roles).items():
                     if role_type == "ARD":
                         digital = []
@@ -209,7 +217,7 @@ class Core(CoreCache, CoreGetters):
             Side.FRONT: [],
             Side.BACK: [],
         }
-        sources: list[HasId] = []
+        sources: list[HasId] = [pcb]
         for template_name in pcb.templates:
             template = Template(**self.load_template(template_name))
             template.vars |= pcb.vars
@@ -217,8 +225,8 @@ class Core(CoreCache, CoreGetters):
             pcb.test_pads |= template.test_pads
             sources.append(template)
 
-        for parent in sources:
-            for side in Side:
+        for side in Side:
+            for parent in sources:
                 parent.id_suffix = side.value
                 shapes[side] += [
                     self.build_shape(parent, data)
