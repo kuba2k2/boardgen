@@ -1,6 +1,6 @@
 {
-	"name": "tuya-16x24-rf1",
-	"title": "Tuya 16x24mm form factor; antenna variant 1",
+	"name": "rf-16mm-type1",
+	"title": "16mm board; antenna variant 1",
 	"width": 16,
 	"height": 6.1,
 	"front": [
