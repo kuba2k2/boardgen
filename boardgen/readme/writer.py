@@ -17,6 +17,7 @@ class ReadmeWriter(ReadmeParts):
 
     def __init__(self, core: Core) -> None:
         self.core = core
+        self.items = []
 
     def clear(self):
         self.items = []
