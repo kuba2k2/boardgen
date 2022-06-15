@@ -16,6 +16,7 @@ roles_nameidx = [
     RoleType.ADC,
     RoleType.PWM,
     RoleType.WAKE,
+    RoleType.SD,
 ]
 roles_arduino = [
     RoleType.ARD_D,
@@ -53,6 +54,8 @@ class Role(Model):
             # append role name to number
             elif self.role_type in roles_nameidx and function.isnumeric():
                 function = self.role_type.name + function
+            elif self.role_type in roles_nameidx and long:
+                function = self.role_type.name + "_" + function
             # SWDIO / SWCLK
             elif self.role_type == RoleType.SWD:
                 function = "SW" + function

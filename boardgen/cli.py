@@ -15,6 +15,7 @@ from .models import Board, Side, Template
 from .readme.writer import ReadmeWriter
 from .shapes.label import Label
 from .utils import load_json
+from .variant.writer import VariantWriter
 from .vector import V
 
 core = Core()
@@ -218,6 +219,42 @@ def write(
 
         echo(f"Saving to '{md}'...")
         readme.save(md)
+
+
+@cli.command()
+@click.argument("boards", nargs=-1, required=True)
+@click.option("--output", "-o", default=".", help="Output directory")
+@click.option("--subdir", "-O", is_flag=True, help="Output into per-board subdirectory")
+def variant(
+    boards: list[str],
+    output: str,
+    subdir: bool,
+):
+    """Write board variant definitions (.h/.cpp)"""
+    boards = [
+        echo(f"Loading board '{board}'...") or core.get_board(board) for board in boards
+    ]
+
+    if output:
+        os.makedirs(output, exist_ok=True)
+
+    for board in boards:
+        board: Board
+        writer = VariantWriter(core)
+        writer.generate(board=board)
+
+        out_h = join(output, f"{board.id}.h")
+        out_cpp = join(output, f"{board.id}.cpp")
+        if subdir:
+            out_h = join(output, board.id, f"variant.h")
+            out_cpp = join(output, board.id, f"variant.cpp")
+            out_pins = join(output, board.id, f"pins_arduino.h")
+            writer.save_compat(out_pins)
+
+        echo(f"Saving to '{out_h}'...")
+        board_name = f"{board.id}.json"
+        writer.save_h(out_h, board_name)
+        writer.save_cpp(out_cpp, board_name)
 
 
 @cli.group(name="list")

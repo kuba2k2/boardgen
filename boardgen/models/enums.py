@@ -22,7 +22,9 @@ class LabelDir(Enum):
 
 class RoleType(Enum):
     NC = "NC"
+    C_NAME = "C_NAME"
     IO = "IO"
+    IRQ = "IRQ"
     PHYSICAL = "PHYSICAL"
     PWR = "PWR"
     GND = "GND"

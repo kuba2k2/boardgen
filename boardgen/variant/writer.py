@@ -1,0 +1,207 @@
+# Copyright (c) Kuba Szczodrzyński 2022-06-15.
+
+import os
+from os.path import dirname
+
+from ..core import Core
+from ..models.board import Board
+from ..models.enums import RoleType
+from .features import PinFeatures
+from .parts import VariantParts
+from .section import SectionType
+
+
+class VariantWriter(VariantParts):
+    core: Core
+
+    def __init__(self, core: Core) -> None:
+        self.core = core
+        self.pins = {}
+        self.sections = {}
+        self.sorted_pins = []
+        self.sorted_sections = []
+
+    def generate(self, board: Board):
+        pcb = board.pcb
+        if not pcb.pinout:
+            return
+        if not [True for f in board.frameworks if "arduino" in f]:
+            return
+
+        interfaces: dict[RoleType, dict[int, dict[str, list[str]]]] = {
+            RoleType.SPI: {},
+            RoleType.I2C: {},
+            RoleType.UART: {},
+        }
+        interface_ports: dict[RoleType, list[str]] = {
+            RoleType.SPI: ["SCK", "MISO", "MOSI"],
+            RoleType.I2C: ["SDA", "SCL"],
+            RoleType.UART: ["RX", "TX"],
+        }
+        interface_sections: dict[RoleType, SectionType] = {
+            RoleType.SPI: SectionType.SPI,
+            RoleType.I2C: SectionType.WIRE,
+            RoleType.UART: SectionType.SERIAL,
+        }
+
+        analog_alias = []
+
+        for pin in pcb.pinout.values():
+            pin_digital = pin.get(RoleType.ARD_D, None)
+            pin_analog = pin.get(RoleType.ARD_A, None)
+            c_name = pin.get(RoleType.C_NAME, None)
+            gpio = pin.get(RoleType.GPIO, None)
+            adc = pin.get(RoleType.ADC, None)
+
+            comment = []
+            hidden = ["ARD_A", "ARD_D", "IO", "C_NAME"]
+            for role_type, roles in pin.items():
+                if role_type.name in hidden:
+                    continue
+                role = self.core.role(role_type)
+                if role:
+                    comment += role.format(roles, long=True, hidden=hidden)
+            comment = ", ".join(comment)
+
+            if pin_digital:
+                pin_name = pin_digital
+                self.add_pin(pin_name, c_name or gpio, comment)
+            elif pin_analog:
+                pin_name = pin_analog
+                self.add_pin(pin_name, c_name or str(adc), comment)
+            else:
+                continue
+
+            self.increment_item(SectionType.PINS, "PINS_COUNT")
+
+            if pin_digital:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_GPIO)
+                self.increment_item(SectionType.PINS, "NUM_DIGITAL_PINS")
+            if pin_analog:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_ADC)
+                self.increment_item(SectionType.PINS, "NUM_ANALOG_INPUTS")
+                self.add_item(SectionType.ANALOG, f"PIN_{pin_analog}", pin_name)
+                analog_alias.append(pin_analog)
+
+            for role_type, roles in pin.items():
+                if role_type not in interfaces:
+                    continue
+                if not isinstance(roles, list):
+                    roles = [str(roles)]
+                for role in roles:
+                    # require "1_RX" format
+                    if not role[0].isnumeric() or role[1] != "_":
+                        continue
+                    (index, _, port) = role.partition("_")
+                    if index not in interfaces[role_type]:
+                        interfaces[role_type][index] = {}
+                    if port not in interfaces[role_type][index]:
+                        interfaces[role_type][index][port] = []
+                    interfaces[role_type][index][port].append(pin_name)
+
+            if RoleType.PWM in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_PWM)
+            if RoleType.I2C in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_I2C)
+            if RoleType.I2S in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_I2S)
+            if RoleType.IRQ in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_IRQ)
+            if RoleType.JTAG in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_JTAG)
+            if RoleType.SPI in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_SPI)
+            if RoleType.SWD in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_SWD)
+            if RoleType.UART in pin:
+                self.add_pin_feature(pin_name, PinFeatures.PIN_UART)
+
+        self.add_item(SectionType.PINS, "NUM_ANALOG_OUTPUTS", 0)
+
+        for alias in analog_alias:
+            self.add_item(SectionType.ANALOG, alias, f"PIN_{alias}")
+
+        for role_type, intfs in interfaces.items():
+            section = interface_sections[role_type]
+            count = 0
+            items = {}
+            for idx in sorted(intfs.keys()):
+                ports = intfs[idx]
+                if not all(port in ports for port in interface_ports[role_type]):
+                    continue
+                count += 1
+                for port in sorted(ports.keys()):
+                    pins = ports[port]
+                    key = f"PIN_{section.name}{idx}_{port}"
+                    if len(pins) > 1:
+                        for i, pin in enumerate(pins):
+                            items[f"{key}_{i}"] = pin
+                    else:
+                        items[key] = pins[0]
+            self.add_item(section, f"{section.name}_INTERFACES_COUNT", count)
+            for key, value in items.items():
+                self.add_item(section, key, value)
+
+        self.prepare_data()
+
+    def prepare_data(self):
+        pins_d = []
+        pins_a = []
+        pins_idx = {}
+        for name in sorted(self.pins.keys(), key=lambda x: int(x[1:])):
+            (gpio, features, comment) = self.pins[name]
+            if name[0] == "D":
+                pins_d.append((name, gpio, features, comment))
+            if name[0] == "A":
+                pins_a.append((name, gpio, features, comment))
+        self.sorted_pins = pins_d + pins_a
+        for i, (name, gpio, _, _) in enumerate(self.sorted_pins):
+            pins_idx[name] = (i, gpio)
+
+        self.sorted_sections = []
+        for type in SectionType:
+            if type not in self.sections:
+                continue
+            section = self.sections[type]
+            for i, (key, value, _) in enumerate(section):
+                if not key.startswith("PIN_"):
+                    continue
+                (idx, gpio) = pins_idx[value]
+                section[i] = (key, f"{idx}u", gpio)
+            self.sorted_sections.append((type, self.sections[type]))
+
+    def save_compat(self, output: str):
+        os.makedirs(dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as f:
+            f.write('#include "variant.h"\n')
+
+    def save_h(self, output: str, board_name: str):
+        os.makedirs(dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as f:
+            lines = [
+                f"/* This file was auto-generated from {board_name} using boardgen */",
+                "",
+                "#pragma once",
+                "",
+                "#include <WVariant.h>",
+                "",
+                self.format_sections(),
+            ]
+            f.write("\n".join(lines))
+
+    def save_cpp(self, output: str, board_name: str):
+        os.makedirs(dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as f:
+            lines = [
+                f"/* This file was auto-generated from {board_name} using boardgen */",
+                "",
+                '#include "variant.h"',
+                "",
+                'extern "C" {',
+                "",
+                self.format_pins(),
+                "",
+                '} // extern "C"',
+                "",
+            ]
+            f.write("\n".join(lines))

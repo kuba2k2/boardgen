@@ -23,7 +23,6 @@ class CoreGetters(ABC):
             }
         return self._roles
 
-    @property
     def role(self, role_type: RoleType) -> Role | None:
         return self.roles.get(role_type, None)
 
