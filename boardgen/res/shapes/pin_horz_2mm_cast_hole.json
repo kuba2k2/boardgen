@@ -1,0 +1,27 @@
+[
+	{
+		"id": "trace",
+		"type": "rect",
+		"pos": "-0.6 , <${PINDIR} : down : -1.7 : 0>",
+		"size": "1.2,1.7",
+		"preset": "copper1"
+	},
+	{
+		"id": "cast",
+		"type": "circle",
+		"pos": "0,0",
+		"d": 0.7,
+		"fill": {
+			"color": "white"
+		}
+	},
+	{
+		"id": "hole",
+		"type": "circle",
+		"pos": "0 , 1.05 * <${PINDIR} : down : -1 : 1>",
+		"d": 0.7,
+		"fill": {
+			"color": "white"
+		}
+	}
+]
