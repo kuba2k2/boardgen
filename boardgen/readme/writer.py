@@ -118,7 +118,7 @@ class ReadmeWriter(ReadmeParts):
                             pin.get(RoleType.I2C, []),
                             pin.get(RoleType.SPI, []),
                             pin.get(RoleType.PWM, []),
-                            pin.get(RoleType.SWD, []),
+                            pin.get(RoleType.SWD, []) + pin.get(RoleType.JTAG, []),
                         ]
                     )
                 for num in sorted(analog.keys(), key=lambda x: int(x[1:])):

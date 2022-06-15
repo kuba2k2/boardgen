@@ -2,7 +2,7 @@
 	{
 		"id": "trace",
 		"type": "rect",
-		"pos": "(${PINDIR} : right : -1.7 : 0) , -0.6",
+		"pos": "<${PINDIR} : right : -1.7 : 0> , -0.6",
 		"size": "1.7,1.2",
 		"preset": "copper1"
 	},
@@ -18,7 +18,7 @@
 	{
 		"id": "hole",
 		"type": "circle",
-		"pos": "1.05 * (${PINDIR} : right : -1 : 1) , 0",
+		"pos": "1.05 * <${PINDIR} : right : -1 : 1> , 0",
 		"d": 0.7,
 		"fill": {
 			"color": "white"

@@ -34,7 +34,10 @@ class Role(Model):
     ) -> list[str]:
         # force a list
         if not isinstance(functions, list):
-            functions = [str(functions)]
+            if not functions:
+                functions = [self.role_type.name]
+            else:
+                functions = [str(functions)]
 
         out = []
         for function in functions:

@@ -42,5 +42,10 @@
 		"fill": {
 			"color": "${TRACE_COLOR}"
 		}
+	},
+	"ioline": {
+		"fill": {
+			"color": "#4E4C4C"
+		}
 	}
 }

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from .vector import V
 
-if_re = r"\((.+?):(.+?):(.+?):(.+?)\)"
+if_re = r"<(.+?):(.+?):(.+?):(.+?)>"
 
 
 class Model(BaseModel):
@@ -22,10 +22,11 @@ def var(s: str, vars: dict) -> str:
             s = s.replace(f"${{{key}}}", str(value))
         if s == s_prev:
             # no replacements made anymore
-            break
+            raise ValueError(f"Missing variables: {s}")
+        s_prev = s
     for match in re.findall(if_re, s):
         (var1, var2, true, false) = match
-        full = f"({var1}:{var2}:{true}:{false})"
+        full = f"<{var1}:{var2}:{true}:{false}>"
         result = true if var1.strip() == var2.strip() else false
         s = s.replace(full, result)
     return s

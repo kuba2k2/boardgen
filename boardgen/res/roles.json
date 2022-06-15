@@ -63,6 +63,14 @@
 		"title": "SPI bus",
 		"color": "#E9BA33"
 	},
+	"IRDA": {
+		"title": "IrDA port",
+		"color": "#AEAFC1"
+	},
+	"FLASH": {
+		"title": "Programming port",
+		"color": "#F68A1E"
+	},
 	"SWD": {
 		"title": "SWD interface",
 		"color": "#FFE680"
@@ -74,6 +82,10 @@
 	"UART": {
 		"title": "UART I/O",
 		"color": "#DCD4EE"
+	},
+	"USB": {
+		"title": "USB port data",
+		"color": "#0F9D58"
 	},
 	"WAKE": {
 		"title": "",

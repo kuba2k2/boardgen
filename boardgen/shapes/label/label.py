@@ -43,10 +43,6 @@ class Label(LabelShape):
         if RoleType.IO not in self.roles:
             self.roles[RoleType.IO] = IOType.NULL.value
 
-        labels: list[tuple[RoleType, str]] = [
-            (RoleType.PHYSICAL, str(pin)),
-        ]
-
         # sort labels according to enum sorting
         role_types = list(RoleType)
         roles = sorted(self.roles.items(), key=lambda x: role_types.index(x[0]))

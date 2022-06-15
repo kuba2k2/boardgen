@@ -39,6 +39,8 @@ class RoleType(Enum):
     I2S = "I2S"
     SPI = "SPI"
     SD = "SD"
+    USB = "USB"
+    IRDA = "IRDA"
 
     PWM = "PWM"
     TMR = "TMR"
@@ -47,6 +49,7 @@ class RoleType(Enum):
 
     JTAG = "JTAG"
     SWD = "SWD"
+    FLASH = "FLASH"
 
 
 class IOType(Enum):

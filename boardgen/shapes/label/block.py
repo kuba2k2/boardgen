@@ -47,6 +47,7 @@ class Block(LabelShape):
                 dominant_baseline="middle",
             )
             negation_line.fill(color=text_color)
+            dwg.add(negation_line)
             text_pos.y += self.width / 32
 
         txt = Text(
