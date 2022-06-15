@@ -1,0 +1,22 @@
+[
+	{
+		"type": "rect",
+		"pos": "-0.1,0.2",
+		"size": "0.2 , ${H}",
+		"preset": "ioline"
+	},
+	{
+		"type": "rect",
+		"pos": "< ${DIR} : left : -${W} - 0.3 : 0 > , ${H}",
+		"size": "${W} + 0.2 , 0.2",
+		"preset": "ioline"
+	},
+	{
+		"type": "rect",
+		"pos": "< ${DIR} : left : -${W} + 0.2 : ${W} - 0.3 > , ${H} + 0.1",
+		"id": "anchor",
+		"size": "0,0",
+		"label_dir": "${DIR}",
+		"label_size": 2
+	}
+]
