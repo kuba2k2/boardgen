@@ -38,6 +38,7 @@ class Core(CoreCache, CoreGetters):
         self._dirs_boards = [
             join(dirname(__file__), "..", "..", "..", "..", "boards"),
             join(self._dir_base, "boards"),
+            "boards",
         ]
         self._dirs_shapes = [
             join(self._dir_base, "shapes"),

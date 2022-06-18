@@ -5,7 +5,6 @@ from os.path import join
 
 import click
 from click import echo
-from click.core import Context
 from devtools import debug
 from svgwrite import Drawing, shapes
 from svgwrite.utils import AutoID
@@ -19,6 +18,17 @@ from .variant.writer import VariantWriter
 from .vector import V
 
 core = Core()
+
+
+def load_boards(boards: list[str | Board]) -> list[Board]:
+    if not boards:
+        return boards
+    if isinstance(boards[0], str):
+        boards = [
+            echo(f"Loading board '{board}'...") or core.get_board(board)
+            for board in boards
+        ]
+    return boards
 
 
 @click.group(help=f"boardgen CLI v{core.version}")
@@ -92,9 +102,7 @@ def draw(
     labels: bool,
 ):
     """Draw board diagrams"""
-    boards = [
-        echo(f"Loading board '{board}'...") or core.get_board(board) for board in boards
-    ]
+    boards = load_boards(boards)
     if dump:
         for board in boards:
             debug(board)
@@ -201,9 +209,7 @@ def write(
     subdir: bool,
 ):
     """Write board README.md"""
-    boards = [
-        echo(f"Loading board '{board}'...") or core.get_board(board) for board in boards
-    ]
+    boards = load_boards(boards)
 
     if output:
         os.makedirs(output, exist_ok=True)
@@ -231,9 +237,7 @@ def variant(
     subdir: bool,
 ):
     """Write board variant definitions (.h/.cpp)"""
-    boards = [
-        echo(f"Loading board '{board}'...") or core.get_board(board) for board in boards
-    ]
+    boards = load_boards(boards)
 
     if output:
         os.makedirs(output, exist_ok=True)
@@ -251,10 +255,29 @@ def variant(
             out_pins = join(output, board.id, f"pins_arduino.h")
             writer.save_compat(out_pins)
 
-        echo(f"Saving to '{out_h}'...")
+        echo(f"Saving to '{out_h}' and '{out_cpp}'...")
         board_name = f"{board.id}.json"
         writer.save_h(out_h, board_name)
         writer.save_cpp(out_cpp, board_name)
+
+
+@cli.command()
+@click.argument("boards", nargs=-1, required=True)
+@click.option("--output", "-o", default=".", help="Output directory")
+@click.option("--subdir", "-O", is_flag=True, help="Output into per-board subdirectory")
+@click.pass_context
+def all(
+    ctx,
+    boards: list[str],
+    output: str,
+    subdir: bool,
+):
+    """Draw and generate complete board specifications"""
+    boards = load_boards(boards)
+
+    ctx.invoke(draw, boards=boards, output=output, subdir=subdir)
+    ctx.invoke(write, boards=boards, output=output, subdir=subdir)
+    ctx.invoke(variant, boards=boards, output=output, subdir=subdir)
 
 
 @cli.group(name="list")
