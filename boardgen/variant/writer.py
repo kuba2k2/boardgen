@@ -195,7 +195,7 @@ class VariantWriter(VariantParts):
             lines = [
                 f"/* This file was auto-generated from {board_name} using boardgen */",
                 "",
-                '#include "variant.h"',
+                "#include <Arduino.h>",
                 "",
                 'extern "C" {',
                 "",

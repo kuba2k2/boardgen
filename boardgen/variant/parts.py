@@ -65,7 +65,9 @@ class VariantParts(ABC):
             out.append(f"\t// {name}: {comment}")
             pad_gpio = " " * (max_gpio - len(gpio))
             pad_features = " " * (max_features - len(features))
-            out.append(f"\t{{{gpio}, {pad_gpio}{features}, {pad_features}PIN_NONE}},")
+            out.append(
+                f"\t{{{gpio}, {pad_gpio}{features}, {pad_features}PIN_NONE, 0}},"
+            )
         out.append("};")
         out.append("// clang-format on")
         return "\n".join(out)
