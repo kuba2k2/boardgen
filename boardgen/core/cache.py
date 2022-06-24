@@ -56,13 +56,10 @@ class CoreCache(ABC):
             if not isinstance(bases, list):
                 bases = [bases]
 
-            result = None
+            result = {}
             for base in bases:
                 base_manifest = self.load_board_base(base)
-                if not result:
-                    result = base_manifest
-                else:
-                    merge_dicts(result, base_manifest)
+                merge_dicts(result, base_manifest)
             merge_dicts(result, manifest)
             manifest = result
         self._cache["boards"][name] = manifest

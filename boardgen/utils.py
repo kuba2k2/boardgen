@@ -46,14 +46,20 @@ def splitxy(xy: str | tuple | V) -> V:
     return V(tuple(map(str_to_num, xy.split(","))))
 
 
-def merge_dicts(d1, d2, path=None):
-    if path is None:
-        path = []
-    for key in d2:
-        if key in d1 and isinstance(d1[key], dict) and isinstance(d2[key], dict):
-            merge_dicts(d1[key], d2[key], path + [str(key)])
-        else:
-            d1[key] = d2[key]
+def merge_dicts(d1, d2):
+    if d1 is not None and type(d1) != type(d2):
+        raise TypeError(f"d1 and d2 are different types: {d1}, {d2}")
+    if isinstance(d2, list):
+        if d1 is None:
+            d1 = []
+        d1.extend(merge_dicts(None, item) for item in d2)
+    elif isinstance(d2, dict):
+        if d1 is None:
+            d1 = {}
+        for key in d2:
+            d1[key] = merge_dicts(d1.get(key, None), d2[key])
+    else:
+        d1 = d2
     return d1
 
 
