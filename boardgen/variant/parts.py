@@ -14,10 +14,11 @@ class VariantParts(ABC):
     sorted_pins: list[tuple[str, str, PinFeatures, str]] = []
     sorted_sections: list[tuple[SectionType, list[SectionItem]]] = []
 
-    def add_pin(self, name: str, gpio: str, comment: str = None):
+    def add_pin(self, name: str, gpio: str, comment: str = None) -> bool:
         if name in self.pins:
-            return
+            return False
         self.pins[name] = (gpio, PinFeatures.PIN_NONE, comment)
+        return True
 
     def add_pin_feature(self, name: str, feature: PinFeatures):
         if name not in self.pins:

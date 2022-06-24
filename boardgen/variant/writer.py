@@ -65,21 +65,24 @@ class VariantWriter(VariantParts):
 
             if pin_digital:
                 pin_name = pin_digital
-                self.add_pin(pin_name, c_name or gpio, comment)
+                added = self.add_pin(pin_name, c_name or gpio, comment)
             elif pin_analog:
                 pin_name = pin_analog
-                self.add_pin(pin_name, c_name or str(adc), comment)
+                added = self.add_pin(pin_name, c_name or str(adc), comment)
             else:
                 continue
 
-            self.increment_item(SectionType.PINS, "PINS_COUNT")
+            if added:
+                self.increment_item(SectionType.PINS, "PINS_COUNT")
 
             if pin_digital:
                 self.add_pin_feature(pin_name, PinFeatures.PIN_GPIO)
-                self.increment_item(SectionType.PINS, "NUM_DIGITAL_PINS")
+                if added:
+                    self.increment_item(SectionType.PINS, "NUM_DIGITAL_PINS")
             if pin_analog:
                 self.add_pin_feature(pin_name, PinFeatures.PIN_ADC)
-                self.increment_item(SectionType.PINS, "NUM_ANALOG_INPUTS")
+                if added:
+                    self.increment_item(SectionType.PINS, "NUM_ANALOG_INPUTS")
                 self.add_item(SectionType.ANALOG, f"PIN_{pin_analog}", pin_name)
                 analog_alias.append(pin_analog)
 
