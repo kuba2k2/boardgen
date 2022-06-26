@@ -119,6 +119,9 @@ def draw(
 
     for board in boards:
         board: Board
+        if not board.pcb:
+            echo(f"Skipping '{board.name}'...")
+            continue
         echo(f"Drawing '{board.name}'...")
 
         pcb = board.pcb

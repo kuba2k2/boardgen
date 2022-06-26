@@ -23,7 +23,7 @@ class VariantWriter(VariantParts):
 
     def generate(self, board: Board):
         pcb = board.pcb
-        if not pcb.pinout:
+        if not pcb or not pcb.pinout:
             return
         if not [True for f in board.frameworks if "arduino" in f]:
             return

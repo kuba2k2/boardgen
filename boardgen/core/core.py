@@ -210,6 +210,8 @@ class Core(CoreCache, CoreGetters):
         board = Board(**manifest)
         pcb = board.pcb
 
+        if not pcb:
+            return board
         pcb.vars["NAME"] = board.build.variant
         pcb.vars["TITLE"] = board.name
         pcb.vars["SYMBOL"] = pcb.symbol
