@@ -12,5 +12,8 @@
 	"bootloader": "Bootloader",
 	"app": "App Image",
 	"download": "OTA Image",
+	"tlv": "TLV Store",
+	"net": "Network Data",
+	"rf": "RF Data",
 	"unknown": "Unknown"
 }
