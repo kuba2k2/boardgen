@@ -261,7 +261,8 @@ def variant(
         echo(f"Saving to '{out_h}' and '{out_cpp}'...")
         board_name = f"{board.id}.json"
         writer.save_h(out_h, board_name)
-        writer.save_cpp(out_cpp, board_name)
+        if writer.pins:
+            writer.save_cpp(out_cpp, board_name)
 
 
 @cli.command()
