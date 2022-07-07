@@ -1,0 +1,72 @@
+{
+	"name": "tuya2",
+	"title": "Tuya boards; 2 series",
+	"width": 15,
+	"height": 17.9,
+	"front": [
+		{
+			"name": "tuya2-pcb",
+			"pos": "0,0"
+		},
+		{
+			"name": "pads_horz5_2mm",
+			"pos": "3.5,16.3",
+			"vars": {
+				"PINTYPE": "pad_10x25",
+				"PINDIR": "down"
+			}
+		},
+		{
+			"id": "pins",
+			"name": "labels_horz5_2mm",
+			"pos": "3.15,17.9",
+			"vars": {
+				"PINDIR": "down"
+			}
+		},
+		{
+			"type": "text",
+			"pos": "7.0,5.0",
+			"text": "${SYMBOL}",
+			"font_size": 1.0,
+			"fill": {
+				"color": "${SILK_COLOR}"
+			}
+		}
+	],
+	"back": [
+		{
+			"name": "tuya2-pcb",
+			"pos": "0,0"
+		},
+		{
+			"name": "pads_horz6_2mm",
+			"pos": "2.45,16.3",
+			"vars": {
+				"PINTYPE": "pad_10x25",
+				"PINDIR": "down"
+			}
+		},
+		{
+			"id": "pins",
+			"name": "labels_horz6_2mm",
+			"pos": "2.1,17.9",
+			"vars": {
+				"PINDIR": "down"
+			}
+		}
+	],
+	"pads": {
+		"1": "tuya2.back.pins.label1.anchor",
+		"2": "tuya2.front.pins.label5.anchor",
+		"3": "tuya2.back.pins.label2.anchor",
+		"4": "tuya2.front.pins.label4.anchor",
+		"5": "tuya2.back.pins.label3.anchor",
+		"6": "tuya2.front.pins.label3.anchor",
+		"7": "tuya2.back.pins.label4.anchor",
+		"8": "tuya2.front.pins.label2.anchor",
+		"9": "tuya2.back.pins.label5.anchor",
+		"10": "tuya2.front.pins.label1.anchor",
+		"11": "tuya2.back.pins.label6.anchor"
+	}
+}

@@ -1,0 +1,62 @@
+[
+	{
+		"id": "label1",
+		"name": "label_line_2mm_${PINDIR}",
+		"pos": "0.35,0",
+		"vars": {
+			"DIR": "left",
+			"W": 0,
+			"H": 2
+		}
+	},
+	{
+		"id": "label2",
+		"name": "label_line_2mm_${PINDIR}",
+		"pos": "2.35,0",
+		"vars": {
+			"DIR": "left",
+			"W": 2,
+			"H": 4
+		}
+	},
+	{
+		"id": "label3",
+		"name": "label_line_2mm_${PINDIR}",
+		"pos": "4.35,0",
+		"vars": {
+			"DIR": "left",
+			"W": 4,
+			"H": 6
+		}
+	},
+	{
+		"id": "label4",
+		"name": "label_line_2mm_${PINDIR}",
+		"pos": "6.35,0",
+		"vars": {
+			"DIR": "right",
+			"W": 4,
+			"H": 6
+		}
+	},
+	{
+		"id": "label5",
+		"name": "label_line_2mm_${PINDIR}",
+		"pos": "8.35,0",
+		"vars": {
+			"DIR": "right",
+			"W": 2,
+			"H": 4
+		}
+	},
+	{
+		"id": "label6",
+		"name": "label_line_2mm_${PINDIR}",
+		"pos": "10.35,0",
+		"vars": {
+			"DIR": "right",
+			"W": 0,
+			"H": 2
+		}
+	}
+]

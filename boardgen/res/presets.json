@@ -10,7 +10,7 @@
 	},
 	"mask_blue_light": {
 		"fill": {
-			"lgrad": ["1,0", "#63A8C9", "0,1", "#308CB1"]
+			"lgrad": ["1,0", "#47A8CD", "0,1", "#008FB5"]
 		},
 		"stroke": {
 			"color": "#B5A739",
@@ -38,6 +38,11 @@
 			"color": "#E5B472"
 		}
 	},
+	"copper2": {
+		"fill": {
+			"color": "#CE7823"
+		}
+	},
 	"trace": {
 		"fill": {
 			"color": "${TRACE_COLOR}"
@@ -46,6 +51,11 @@
 	"ioline": {
 		"fill": {
 			"color": "#4E4C4C"
+		}
+	},
+	"stroke_clear": {
+		"stroke": {
+			"width": 0
 		}
 	}
 }

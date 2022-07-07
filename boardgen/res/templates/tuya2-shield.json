@@ -1,0 +1,15 @@
+{
+	"name": "tuya2-shield",
+	"title": "Tuya 2 shielding",
+	"width": 15,
+	"height": 17.9,
+	"front": [
+		{
+			"comment": "Metal shielding",
+			"type": "rect",
+			"pos": "0.3,6",
+			"size": "14.4,8",
+			"preset": "shield"
+		}
+	]
+}

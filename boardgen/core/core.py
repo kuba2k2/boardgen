@@ -220,13 +220,14 @@ class Core(CoreCache, CoreGetters):
             Side.FRONT: [],
             Side.BACK: [],
         }
-        sources: list[HasId] = [pcb]
+        sources: list[HasId] = []
         for template_name in pcb.templates:
             template = Template(**self.load_template(template_name))
             template.vars |= pcb.vars
             pcb.pads |= template.pads
             pcb.test_pads |= template.test_pads
             sources.append(template)
+        sources.append(pcb)
 
         for side in Side:
             for parent in sources:
