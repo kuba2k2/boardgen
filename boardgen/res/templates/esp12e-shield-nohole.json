@@ -1,0 +1,15 @@
+{
+	"name": "esp12e-shield-nohole",
+	"title": "ESP-12E shielding (cast, no hole)",
+	"width": 16,
+	"height": 24,
+	"front": [
+		{
+			"comment": "Metal shielding",
+			"type": "rect",
+			"pos": "1.2,6.95",
+			"size": "13.6,15.8",
+			"preset": "shield"
+		}
+	]
+}

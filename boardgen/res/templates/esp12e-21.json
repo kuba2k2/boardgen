@@ -1,0 +1,124 @@
+{
+	"name": "esp12e-21",
+	"title": "ESP-12E form factor (21-pin)",
+	"width": 16,
+	"height": 24,
+	"front": [
+		{
+			"comment": "PCB soldermask",
+			"type": "rect",
+			"pos": "0,0",
+			"size": "16,24",
+			"preset": "${MASK_PRESET}"
+		},
+		{
+			"comment": "Pins (1-8)",
+			"id": "left",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "0,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "left"
+			}
+		},
+		{
+			"comment": "Pins (9-16)",
+			"id": "right",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "16,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "right"
+			}
+		},
+		{
+			"comment": "Pins (17-21)",
+			"name": "pins_horz5_2mm_0.7mm",
+			"pos": "3.7,24",
+			"vars": {
+				"PINTYPE": "${PINTYPE_HORZ}",
+				"PINDIR": "down"
+			}
+		},
+		{
+			"comment": "Pin labels (17-21)",
+			"id": "down",
+			"name": "labels_horz5_2mm",
+			"pos": "3.7,24",
+			"vars": {
+				"PINDIR": "down"
+			}
+		}
+	],
+	"back": [
+		{
+			"comment": "PCB soldermask",
+			"type": "rect",
+			"pos": "0,0",
+			"size": "16,24",
+			"preset": "${MASK_PRESET}"
+		},
+		{
+			"comment": "Pins (9-16)",
+			"id": "right",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "0,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "left"
+			}
+		},
+		{
+			"comment": "Pins (1-8)",
+			"id": "left",
+			"name": "pins_vert8_2mm_0.7mm",
+			"pos": "16,8",
+			"vars": {
+				"PINTYPE": "${PINTYPE_VERT}",
+				"PINDIR": "right"
+			}
+		},
+		{
+			"comment": "Pins (17-21)",
+			"name": "pins_horz6_2mm_0.7mm",
+			"pos": "3.7,24",
+			"vars": {
+				"PINTYPE": "${PINTYPE_HORZ}",
+				"PINDIR": "down"
+			}
+		},
+		{
+			"comment": "Pin labels (17-21)",
+			"id": "down",
+			"name": "labels_horz5_2mm",
+			"pos": "3.7,24",
+			"vars": {
+				"PINDIR": "down"
+			}
+		}
+	],
+	"pads": {
+		"1": "esp12e-21.front.left.pin1",
+		"2": "esp12e-21.front.left.pin2",
+		"3": "esp12e-21.front.left.pin3",
+		"4": "esp12e-21.front.left.pin4",
+		"5": "esp12e-21.front.left.pin5",
+		"6": "esp12e-21.front.left.pin6",
+		"7": "esp12e-21.front.left.pin7",
+		"8": "esp12e-21.front.left.pin8",
+		"9": "esp12e-21.front.right.pin8",
+		"10": "esp12e-21.front.right.pin7",
+		"11": "esp12e-21.front.right.pin6",
+		"12": "esp12e-21.front.right.pin5",
+		"13": "esp12e-21.front.right.pin4",
+		"14": "esp12e-21.front.right.pin3",
+		"15": "esp12e-21.front.right.pin2",
+		"16": "esp12e-21.front.right.pin1",
+		"17": "esp12e-21.front.down.label1.anchor",
+		"18": "esp12e-21.front.down.label2.anchor",
+		"19": "esp12e-21.front.down.label3.anchor",
+		"20": "esp12e-21.front.down.label4.anchor",
+		"21": "esp12e-21.front.down.label5.anchor"
+	},
+	"test_pads": {}
+}
