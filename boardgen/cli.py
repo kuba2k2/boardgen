@@ -24,6 +24,8 @@ def load_boards(boards: list[str | Board]) -> list[Board]:
     if not boards:
         return boards
     if isinstance(boards[0], str):
+        if boards[0] == "all":
+            boards = core.list_json("boards")
         boards = [
             echo(f"Loading board '{board}'...") or core.get_board(board)
             for board in boards
