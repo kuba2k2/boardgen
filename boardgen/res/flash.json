@@ -15,5 +15,8 @@
 	"tlv": "TLV Store",
 	"net": "Network Data",
 	"rf": "RF Data",
+	"boot": "Boot Image",
+	"part_table": "Partition Table",
+	"fal_ptab": "FAL Part. Table",
 	"unknown": "Unknown"
 }
