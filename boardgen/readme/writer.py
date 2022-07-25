@@ -78,8 +78,9 @@ class ReadmeWriter(ReadmeParts):
 
         # Pinout
         if board.pcb and board.pcb.pinout:
-            self.add_heading("Pinout", 2)
-            self.add_img("Pinout", f"pinout_{board.id}.svg")
+            if board.pcb.templates:
+                self.add_heading("Pinout", 2)
+                self.add_img("Pinout", f"pinout_{board.id}.svg")
 
             if [True for f in board.frameworks if "arduino" in f]:
                 self.add_heading("Arduino Core pin mapping", 2)
