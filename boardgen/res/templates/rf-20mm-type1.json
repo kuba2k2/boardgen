@@ -1,0 +1,80 @@
+{
+	"name": "rf-20mm-type1",
+	"title": "20mm board; antenna variant 1",
+	"width": 20,
+	"height": 6.1,
+	"front": [
+		{
+			"type": "rect",
+			"pos": "3.1,0.8",
+			"size": "0.5,5.2",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "3.1,0.8",
+			"size": "4.6,0.5",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "5.3,0.8",
+			"size": "0.5,5.2",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "7.2,0.8",
+			"size": "0.5,3.0",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "7.2,3.3",
+			"size": "3.0,0.5",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "9.7,0.8",
+			"size": "0.5,3.0",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "9.7,0.8",
+			"size": "2.7,0.5",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "11.9,0.8",
+			"size": "0.5,3.0",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "11.9,3.3",
+			"size": "3.0,0.5",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "14.4,0.8",
+			"size": "0.5,3.0",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "14.4,0.8",
+			"size": "2.5,0.5",
+			"preset": "trace"
+		},
+		{
+			"type": "rect",
+			"pos": "16.4,0.8",
+			"size": "0.5,4.4",
+			"preset": "trace"
+		}
+	]
+}

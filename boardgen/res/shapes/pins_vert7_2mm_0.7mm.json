@@ -1,0 +1,51 @@
+[
+	{
+		"id": "pin1",
+		"name": "${PINTYPE}",
+		"pos": "0,0.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	},
+	{
+		"id": "pin2",
+		"name": "${PINTYPE}",
+		"pos": "0,2.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	},
+	{
+		"id": "pin3",
+		"name": "${PINTYPE}",
+		"pos": "0,4.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	},
+	{
+		"id": "pin4",
+		"name": "${PINTYPE}",
+		"pos": "0,6.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	},
+	{
+		"id": "pin5",
+		"name": "${PINTYPE}",
+		"pos": "0,8.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	},
+	{
+		"id": "pin6",
+		"name": "${PINTYPE}",
+		"pos": "0,10.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	},
+	{
+		"id": "pin7",
+		"name": "${PINTYPE}",
+		"pos": "0,12.35",
+		"label_dir": "${PINDIR}",
+		"label_size": 2
+	}
+]
