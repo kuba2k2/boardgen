@@ -22,6 +22,7 @@ from .getters import CoreGetters
 
 class Core(CoreCache, CoreGetters):
     shape_ctors: dict[ShapeType, type]
+    is_libretuya: bool = False
 
     _dir_base: str
     _dirs_boards: list[str]
@@ -55,6 +56,9 @@ class Core(CoreCache, CoreGetters):
             ShapeType.SUBSHAPE: ShapeGroup,
             ShapeType.TEXT: Text,
         }
+        self.is_libretuya = isfile(
+            join(dirname(__file__), "..", "..", "..", "..", "platform.json")
+        )
 
     @property
     def version(self) -> str | None:

@@ -40,6 +40,13 @@ class ReadmeParts(ABC):
         self.items.append("- " + "\n- ".join(items))
         return self
 
+    def add_code(self, code: str | list[str], lang: str = None) -> "ReadmeParts":
+        if isinstance(code, list):
+            code = "\n".join(code)
+        if not lang:
+            lang = ""
+        self.items.append(f"```{lang}\n{code}\n```")
+
     def add_table(self, header: list[str], *rows: list[str]) -> "ReadmeParts":
         maxlen = [len(h) for h in header]
         for row in rows:

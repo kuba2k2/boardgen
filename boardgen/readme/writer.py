@@ -41,6 +41,7 @@ class ReadmeWriter(ReadmeParts):
         # Specifications
         header = ["Parameter", "Value"]
         rows = [
+            ["Board code", f"`{board.id}`"],
             ["MCU", board.build.mcu.upper()],
         ]
         if board.doc.params.manufacturer:
@@ -75,6 +76,19 @@ class ReadmeWriter(ReadmeParts):
         if board.doc.params.extra:
             rows.extend([[k, v] for k, v in board.doc.params.extra.items()])
         self.add_table(header, *rows)
+
+        # Usage
+        self.add_heading("Usage", 2)
+        self.add_text("**Board code:**", f"`{board.id}`")
+        if self.core.is_libretuya:
+            self.add_text("In `platformio.ini`:")
+            code = [
+                f"[env:{board.id}]",
+                "platform = libretuya",
+                f"board = {board.id}",
+                "framework = arduino",
+            ]
+            self.add_code(code, lang="ini")
 
         # Pinout
         if board.pcb and board.pcb.pinout:
