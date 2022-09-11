@@ -75,6 +75,9 @@ class ReadmeWriter(ReadmeParts):
             rows.append(["I/O", ", ".join(counts)])
         if board.doc.params.extra:
             rows.extend([[k, v] for k, v in board.doc.params.extra.items()])
+        if board.doc.fccid:
+            link = self.get_link(board.doc.fccid, f"https://fccid.io/{board.doc.fccid}")
+            rows.append(["FCC ID", link])
         self.add_table(header, *rows)
 
         # Usage
