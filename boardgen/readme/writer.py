@@ -92,6 +92,14 @@ class ReadmeWriter(ReadmeParts):
                 "framework = arduino",
             ]
             self.add_code(code, lang="ini")
+            self.add_text("In ESPHome YAML:")
+            code = [
+                "libretuya:",
+                "  board: " + board.id,
+                "  framework:",
+                "    version: dev",
+            ]
+            self.add_code(code, lang="yaml")
 
         # Pinout
         if board.pcb and board.pcb.pinout:
