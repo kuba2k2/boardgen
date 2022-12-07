@@ -10,3 +10,4 @@ class SectionType(Enum):
     SPI = "SPI Interfaces"
     WIRE = "Wire Interfaces"
     SERIAL = "Serial ports"
+    MACROS = "Pin function macros"

@@ -3,6 +3,8 @@
 import os
 from os.path import dirname
 
+from natsort import natsort_keygen
+
 from ..core import Core
 from ..models.board import Board
 from ..models.enums import RoleType
@@ -43,6 +45,11 @@ class VariantWriter(VariantParts):
             RoleType.I2C: SectionType.WIRE,
             RoleType.UART: SectionType.SERIAL,
         }
+        macro_roles = [
+            RoleType.GPIO,
+            RoleType.ADC,
+            RoleType.PWM,
+        ] + list(interfaces.keys())
 
         analog_alias = []
 
@@ -54,6 +61,7 @@ class VariantWriter(VariantParts):
             adc = pin.get(RoleType.ADC, None)
 
             comment = []
+            role_text = []
             hidden = ["ARD_A", "ARD_D", "IO", "C_NAME"]
             for role_type, roles in pin.items():
                 if role_type.name in hidden:
@@ -61,6 +69,8 @@ class VariantWriter(VariantParts):
                 role = self.core.role(role_type)
                 if role:
                     comment += role.format(roles, long=True, hidden=hidden)
+                    if role_type in macro_roles:
+                        role_text += role.format(roles, long=False, hidden=hidden)
             comment = ", ".join(comment)
 
             if pin_digital:
@@ -71,6 +81,9 @@ class VariantWriter(VariantParts):
                 added = self.add_pin(pin_name, c_name or str(adc), comment)
             else:
                 continue
+
+            # add pin role short names to generate macros
+            self.add_pin_roles(pin_name, *role_text)
 
             if added:
                 self.increment_item(SectionType.PINS, "PINS_COUNT")
@@ -152,14 +165,20 @@ class VariantWriter(VariantParts):
         pins_a = []
         pins_idx = {}
         for name in sorted(self.pins.keys(), key=lambda x: int(x[1:])):
-            (gpio, features, comment) = self.pins[name]
+            (gpio, features, comment, roles) = self.pins[name]
             if name[0] == "D":
-                pins_d.append((name, gpio, features, comment))
+                pins_d.append((name, gpio, features, comment, roles))
             if name[0] == "A":
-                pins_a.append((name, gpio, features, comment))
+                pins_a.append((name, gpio, features, comment, roles))
         self.sorted_pins = pins_d + pins_a
-        for i, (name, gpio, _, _) in enumerate(self.sorted_pins):
+
+        for i, (name, gpio, _, _, roles) in enumerate(self.sorted_pins):
             pins_idx[name] = (i, gpio)
+            for role in roles:
+                self.add_item(SectionType.MACROS, f"PIN_FUNCTION_{role}", name)
+
+        natsort_key = natsort_keygen()
+        self.sections.get(SectionType.MACROS, []).sort(key=natsort_key)
 
         self.sorted_sections = []
         for type in SectionType:

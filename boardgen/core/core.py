@@ -58,7 +58,7 @@ class Core(CoreCache, CoreGetters):
         }
         self.is_libretuya = isfile(
             join(dirname(__file__), "..", "..", "..", "..", "platform.json")
-        )
+        ) or isfile("families.json")
 
     @property
     def version(self) -> str | None:

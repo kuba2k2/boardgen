@@ -2,6 +2,7 @@
 
 from abc import ABC
 
+from ..models import Role
 from .features import PinFeatures
 from .section import SectionType
 
@@ -9,7 +10,7 @@ SectionItem = tuple[str, object, str]
 
 
 class VariantParts(ABC):
-    pins: dict[str, tuple[str, PinFeatures, str]] = {}
+    pins: dict[str, tuple[str, PinFeatures, str, set[str]]] = {}
     sections: dict[SectionType, list[SectionItem]] = {}
     sorted_pins: list[tuple[str, str, PinFeatures, str]] = []
     sorted_sections: list[tuple[SectionType, list[SectionItem]]] = []
@@ -17,16 +18,23 @@ class VariantParts(ABC):
     def add_pin(self, name: str, gpio: str, comment: str = None) -> bool:
         if name in self.pins:
             return False
-        self.pins[name] = (gpio, PinFeatures.PIN_NONE, comment)
+        self.pins[name] = (gpio, PinFeatures.PIN_NONE, comment, set())
         return True
 
     def add_pin_feature(self, name: str, feature: PinFeatures):
         if name not in self.pins:
             return
-        (gpio, features, comment) = self.pins[name]
+        (gpio, features, comment, roles) = self.pins[name]
         features &= ~(PinFeatures.PIN_NONE)
         features |= feature
-        self.pins[name] = (gpio, features, comment)
+        self.pins[name] = (gpio, features, comment, roles)
+
+    def add_pin_roles(self, name: str, *role_text: str):
+        if name not in self.pins:
+            return
+        (_, _, _, roles) = self.pins[name]
+        for role in role_text:
+            roles.add(role)
 
     def add_item(
         self, section: SectionType, key: str, value: object, comment: str = None
@@ -53,7 +61,7 @@ class VariantParts(ABC):
         items: list[tuple[str, str, str, str]] = []
         max_gpio = 0
         max_features = 0
-        for name, gpio, features, comment in self.sorted_pins:
+        for name, gpio, features, comment, _ in self.sorted_pins:
             features_str = []
             for feature in PinFeatures:
                 if features & feature:
