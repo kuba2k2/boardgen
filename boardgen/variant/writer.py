@@ -1,6 +1,7 @@
 # Copyright (c) Kuba Szczodrzyński 2022-06-15.
 
 import os
+import re
 from os.path import dirname
 
 from natsort import natsort_keygen
@@ -172,11 +173,25 @@ class VariantWriter(VariantParts):
                 pins_a.append((name, gpio, features, comment, roles))
         self.sorted_pins = pins_d + pins_a
 
+        pin_macros: list[tuple[str, str]] = []
         for i, (name, gpio, _, _, roles) in enumerate(self.sorted_pins):
             pins_idx[name] = (i, gpio)
             for role in roles:
-                self.add_item(SectionType.MACROS, f"PIN_FUNCTION_{role}", name)
+                pin_macros.append((role, name))
 
+        # find all pins with duplicate roles (i.e. PWM0==2 and PWM0==10)
+        # remove entire role types if found
+        to_remove = set()
+        for role, name in pin_macros:
+            if sum(1 for x in pin_macros if x[0] == role) > 1:
+                to_remove.add(re.sub(r"[\d]", "", role))
+        for role in to_remove:
+            pin_macros = [m for m in pin_macros if not m[0].startswith(role)]
+
+        # add macros for pin functions
+        for role, name in pin_macros:
+            self.add_item(SectionType.MACROS, f"PIN_FUNCTION_{role}", name)
+        # sort the macros naturally
         natsort_key = natsort_keygen()
         self.sections.get(SectionType.MACROS, []).sort(key=natsort_key)
 
