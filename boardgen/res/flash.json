@@ -18,5 +18,8 @@
 	"boot": "Boot Image",
 	"part_table": "Partition Table",
 	"fal_ptab": "FAL Part. Table",
+	"filesystem": "File System",
+	"param1": "Param 1",
+	"param2": "Param 2",
 	"unknown": "Unknown"
 }

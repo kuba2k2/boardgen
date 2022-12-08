@@ -17,6 +17,7 @@ roles_nameidx = [
     RoleType.PWM,
     RoleType.WAKE,
     RoleType.SD,
+    RoleType.DVP,
 ]
 roles_arduino = [
     RoleType.ARD_D,

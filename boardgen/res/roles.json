@@ -29,6 +29,10 @@
 		"title": "I2S peripheral",
 		"color": "#FF8080"
 	},
+	"DVP": {
+		"title": "Camera interface",
+		"color": "#66D9EF"
+	},
 	"IO": {
 		"title": "Input/Output",
 		"color": "#4E4C4C",
@@ -56,7 +60,7 @@
 		"color": "#000000"
 	},
 	"SD": {
-		"title": "SD card interface",
+		"title": "SD card interface/SDIO",
 		"color": "#F4DE51"
 	},
 	"SPI": {

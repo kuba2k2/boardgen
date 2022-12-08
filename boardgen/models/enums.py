@@ -39,6 +39,7 @@ class RoleType(Enum):
     UART = "UART"
     I2C = "I2C"
     I2S = "I2S"
+    DVP = "DVP"
     SPI = "SPI"
     SD = "SD"
     USB = "USB"
