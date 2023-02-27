@@ -11,7 +11,6 @@ class Board(Model):
     debug: "BoardDebug" = None
     doc: "BoardDoc" = None
     flash: list[FlashRegion] = None
-    frameworks: list[str]
     name: str
     pcb: Pcb = None
     upload: "BoardUpload"
@@ -38,6 +37,10 @@ class Board(Model):
     def cpu_freq(self) -> str:
         f_cpu = "".join(c for c in self.build.f_cpu if c.isnumeric())
         return sizeof(int(f_cpu), suffix="Hz", base=1000)
+
+    @property
+    def has_arduino_core(self) -> bool:
+        return True
 
 
 class BoardBuild(Model):

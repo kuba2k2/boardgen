@@ -28,7 +28,7 @@ class VariantWriter(VariantParts):
         pcb = board.pcb
         if not pcb or not pcb.pinout:
             return
-        if not [True for f in board.frameworks if "arduino" in f]:
+        if not board.has_arduino_core:
             return
 
         interfaces: dict[RoleType, dict[int, dict[str, list[str]]]] = {
@@ -39,7 +39,7 @@ class VariantWriter(VariantParts):
         interface_ports: dict[RoleType, list[str]] = {
             RoleType.SPI: ["SCK", "MISO", "MOSI"],
             RoleType.I2C: ["SDA", "SCL"],
-            RoleType.UART: ["RX", "TX"],
+            RoleType.UART: ["TX"],
         }
         interface_sections: dict[RoleType, SectionType] = {
             RoleType.SPI: SectionType.SPI,
@@ -138,6 +138,8 @@ class VariantWriter(VariantParts):
         for alias in analog_alias:
             self.add_item(SectionType.ANALOG, alias, f"PIN_{alias}")
 
+        has_interfaces = set()
+
         for role_type, intfs in interfaces.items():
             section = interface_sections[role_type]
             count = 0
@@ -145,10 +147,12 @@ class VariantWriter(VariantParts):
             for idx in sorted(intfs.keys()):
                 ports = intfs[idx]
                 if not all(port in ports for port in interface_ports[role_type]):
+                    # skip incomplete ports (i.e. only SDA1 available)
                     continue
                 count += 1
                 for port in sorted(ports.keys()):
                     pins = ports[port]
+                    has_interfaces.add(f"{section.name}{idx}")
                     key = f"PIN_{section.name}{idx}_{port}"
                     if len(pins) > 1:
                         for i, pin in enumerate(pins):
@@ -158,6 +162,9 @@ class VariantWriter(VariantParts):
             self.add_item(section, f"{section.name}_INTERFACES_COUNT", count)
             for key, value in items.items():
                 self.add_item(section, key, value)
+
+        for name in sorted(has_interfaces):
+            self.add_item(SectionType.PORTS, f"HAS_{name}", 1)
 
         self.prepare_data()
 
@@ -190,7 +197,7 @@ class VariantWriter(VariantParts):
 
         # add macros for pin functions
         for role, name in pin_macros:
-            self.add_item(SectionType.MACROS, f"PIN_FUNCTION_{role}", name)
+            self.add_item(SectionType.MACROS, f"PIN_{role}", name)
         # sort the macros naturally
         natsort_key = natsort_keygen()
         self.sections.get(SectionType.MACROS, []).sort(key=natsort_key)
@@ -207,11 +214,6 @@ class VariantWriter(VariantParts):
                 section[i] = (key, f"{idx}u", gpio)
             self.sorted_sections.append((type, self.sections[type]))
 
-    def save_compat(self, output: str):
-        os.makedirs(dirname(output), exist_ok=True)
-        with open(output, "w", encoding="utf-8") as f:
-            f.write('#include "variant.h"\n')
-
     def save_h(self, output: str, board_name: str):
         os.makedirs(dirname(output), exist_ok=True)
         with open(output, "w", encoding="utf-8") as f:
@@ -219,8 +221,6 @@ class VariantWriter(VariantParts):
                 f"/* This file was auto-generated from {board_name} using boardgen */",
                 "",
                 "#pragma once",
-                "",
-                "#include <WVariant.h>",
                 "",
                 self.format_sections(),
             ]

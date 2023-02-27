@@ -11,3 +11,4 @@ class SectionType(Enum):
     WIRE = "Wire Interfaces"
     SERIAL = "Serial ports"
     MACROS = "Pin function macros"
+    PORTS = "Port availability"

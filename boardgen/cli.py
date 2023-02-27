@@ -257,8 +257,6 @@ def variant(
         if subdir:
             out_h = join(output, board.id, f"variant.h")
             out_cpp = join(output, board.id, f"variant.cpp")
-            out_pins = join(output, board.id, f"pins_arduino.h")
-            writer.save_compat(out_pins)
 
         echo(f"Saving to '{out_h}' and '{out_cpp}'...")
         board_name = f"{board.id}.json"

@@ -107,7 +107,7 @@ class ReadmeWriter(ReadmeParts):
                 self.add_heading("Pinout", 2)
                 self.add_img("Pinout", f"pinout_{board.id}.svg")
 
-            if [True for f in board.frameworks if "arduino" in f]:
+            if board.has_arduino_core:
                 self.add_heading("Arduino Core pin mapping", 2)
                 header = ["No.", "Pin", "UART", "I²C", "SPI", "PWM", "Other"]
                 rows = []
@@ -145,7 +145,9 @@ class ReadmeWriter(ReadmeParts):
                             pin.get(RoleType.I2C, []),
                             pin.get(RoleType.SPI, []),
                             pin.get(RoleType.PWM, []),
-                            pin.get(RoleType.SWD, []) + pin.get(RoleType.JTAG, []) + pin.get(RoleType.DVP, []),
+                            pin.get(RoleType.SWD, [])
+                            + pin.get(RoleType.JTAG, [])
+                            + pin.get(RoleType.DVP, []),
                         ]
                     )
                 for num in sorted(analog.keys(), key=lambda x: int(x[1:])):
