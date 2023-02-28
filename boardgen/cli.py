@@ -169,7 +169,7 @@ def draw(
         else:
             scale = 99999
             size_pad = part_size * 0.90  # 5% padding from each side
-            for (_, _, size, _) in images:
+            for _, _, size, _ in images:
                 scale = min(scale, size_pad.x / size.x, size_pad.y / size.y)
             echo(" - calculated scale: %.2f" % scale)
             vb_size = px_size / scale
