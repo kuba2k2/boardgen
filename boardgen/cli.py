@@ -1,7 +1,7 @@
 # Copyright (c) Kuba Szczodrzyński 2022-05-09.
 
 import os
-from os.path import join
+from os.path import isfile, join
 
 import click
 from click import echo
@@ -282,6 +282,22 @@ def all(
     ctx.invoke(draw, boards=boards, output=output, subdir=subdir)
     ctx.invoke(write, boards=boards, output=output, subdir=subdir)
     ctx.invoke(variant, boards=boards, output=output, subdir=subdir)
+
+
+@cli.command()
+@click.option("--no-docs", "-D", is_flag=True, help="Write variant files only")
+@click.pass_context
+def ltci(ctx, no_docs: bool):
+    """Generate board files for LibreTuya CI"""
+    if not isfile("families.json"):
+        print("Run this command in LT root directory")
+        exit(1)
+    boards = load_boards(["all"])
+
+    if not no_docs:
+        ctx.invoke(draw, boards=boards, output="boards/", subdir=True)
+        ctx.invoke(write, boards=boards, output="boards/", subdir=True)
+    ctx.invoke(variant, boards=boards, output="boards/variants/", subdir=False)
 
 
 @cli.group(name="list")
