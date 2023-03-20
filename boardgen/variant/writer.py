@@ -63,13 +63,13 @@ class VariantWriter(VariantParts):
 
     @staticmethod
     def read_pin(pin: PinDict) -> tuple[str, str, int] | None:
-        name = pin.get(RoleType.GPIO, None)
+        name = pin.get(RoleType.GPIO, None) or pin.get(RoleType.ADC, None)
         c_name = pin.get(RoleType.C_NAME, name)
         if not name:
             return None
         number = pin.get(RoleType.GPIONUM, None)
         if number is not None:
-            return name, c_name, number
+            return name, c_name, int(number)
         number = re.sub(r"\D", "", name)
         return name, c_name, int(number)
 
