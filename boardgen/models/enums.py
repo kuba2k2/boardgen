@@ -31,6 +31,7 @@ class RoleType(Enum):
     CTRL = "CTRL"
     IC = "IC"
     GPIO = "GPIO"
+    GPIONUM = "GPIONUM"
     ADC = "ADC"
 
     ARD_D = "ARD_D"

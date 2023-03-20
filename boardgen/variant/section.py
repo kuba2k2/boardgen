@@ -6,9 +6,9 @@ from enum import Enum
 class SectionType(Enum):
     PINS = "Pins"
     LEDS = "LEDs"
-    ANALOG = "Analog pins"
     SPI = "SPI Interfaces"
     WIRE = "Wire Interfaces"
     SERIAL = "Serial ports"
     MACROS = "Pin function macros"
     PORTS = "Port availability"
+    ARDUINO = "Arduino pin names"

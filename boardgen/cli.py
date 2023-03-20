@@ -253,16 +253,16 @@ def variant(
         writer.generate(board=board)
 
         out_h = join(output, f"{board.id}.h")
-        out_cpp = join(output, f"{board.id}.cpp")
+        out_c = join(output, f"{board.id}.c")
         if subdir:
             out_h = join(output, board.id, f"variant.h")
-            out_cpp = join(output, board.id, f"variant.cpp")
+            out_c = join(output, board.id, f"variant.c")
 
-        echo(f"Saving to '{out_h}' and '{out_cpp}'...")
+        echo(f"Saving to '{out_h}' and '{out_c}'...")
         board_name = f"{board.id}.json"
         writer.save_h(out_h, board_name)
         if writer.pins:
-            writer.save_cpp(out_cpp, board_name)
+            writer.save_c(out_c, board_name)
 
 
 @cli.command()
@@ -367,3 +367,7 @@ def list_flash():
     echo("Available flash regions:")
     for region_name, description in core.flash.items():
         echo(f" - {region_name}: {description}")
+
+
+if __name__ == "__main__":
+    cli()

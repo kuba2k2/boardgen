@@ -4,14 +4,51 @@ import os
 import re
 from os.path import dirname
 
-from natsort import natsort_keygen
-
 from ..core import Core
 from ..models.board import Board
 from ..models.enums import RoleType
+from ..models.pcb import PinDict
 from .features import PinFeatures
 from .parts import VariantParts
 from .section import SectionType
+
+# map of RoleTypes to variant.h SectionTypes
+SECTION_MAP = {
+    RoleType.SPI: SectionType.SPI,
+    RoleType.I2C: SectionType.WIRE,
+    RoleType.UART: SectionType.SERIAL,
+}
+
+# map of RoleTypes to PinFeatures
+FEATURE_MAP = {
+    RoleType.ARD_D: PinFeatures.PIN_GPIO,
+    RoleType.ARD_A: PinFeatures.PIN_ADC,
+    RoleType.PWM: PinFeatures.PIN_PWM,
+    RoleType.I2C: PinFeatures.PIN_I2C,
+    RoleType.I2S: PinFeatures.PIN_I2S,
+    RoleType.IRQ: PinFeatures.PIN_IRQ,
+    RoleType.JTAG: PinFeatures.PIN_JTAG,
+    RoleType.SPI: PinFeatures.PIN_SPI,
+    RoleType.SWD: PinFeatures.PIN_SWD,
+    RoleType.UART: PinFeatures.PIN_UART,
+}
+
+# (indexed) communication ports with lists of required signals
+PORT_SIGNALS = {
+    RoleType.SPI: ["SCK", "MISO", "MOSI"],
+    RoleType.I2C: ["SDA", "SCL"],
+    RoleType.UART: ["TX"],
+}
+
+# list of RoleTypes to include in SectionType.MACROS
+MACROS_ROLES = list(PORT_SIGNALS.keys()) + [
+    RoleType.GPIO,
+    RoleType.ADC,
+    RoleType.PWM,
+]
+
+# RoleTypes not included in the variant.cpp comment lines
+ROLES_HIDDEN = ["ARD_A", "ARD_D", "IO", "C_NAME"]
 
 
 class VariantWriter(VariantParts):
@@ -21,8 +58,20 @@ class VariantWriter(VariantParts):
         self.core = core
         self.pins = {}
         self.sections = {}
-        self.sorted_pins = []
-        self.sorted_sections = []
+        self.gpio_map = {}
+        self.static_pins = {}
+
+    @staticmethod
+    def read_pin(pin: PinDict) -> tuple[str, str, int] | None:
+        name = pin.get(RoleType.GPIO, None)
+        c_name = pin.get(RoleType.C_NAME, name)
+        if not name:
+            return None
+        number = pin.get(RoleType.GPIONUM, None)
+        if number is not None:
+            return name, c_name, number
+        number = re.sub(r"\D", "", name)
+        return name, c_name, int(number)
 
     def generate(self, board: Board):
         pcb = board.pcb
@@ -31,77 +80,76 @@ class VariantWriter(VariantParts):
         if not board.has_arduino_core:
             return
 
-        interfaces: dict[RoleType, dict[int, dict[str, list[str]]]] = {
-            RoleType.SPI: {},
-            RoleType.I2C: {},
-            RoleType.UART: {},
-        }
-        interface_ports: dict[RoleType, list[str]] = {
-            RoleType.SPI: ["SCK", "MISO", "MOSI"],
-            RoleType.I2C: ["SDA", "SCL"],
-            RoleType.UART: ["TX"],
-        }
-        interface_sections: dict[RoleType, SectionType] = {
-            RoleType.SPI: SectionType.SPI,
-            RoleType.I2C: SectionType.WIRE,
-            RoleType.UART: SectionType.SERIAL,
-        }
-        macro_roles = [
-            RoleType.GPIO,
-            RoleType.ADC,
-            RoleType.PWM,
-        ] + list(interfaces.keys())
+        self.add_item(SectionType.PINS, "PINS_COUNT", 0, "Total GPIO count")
+        self.add_item(SectionType.PINS, "NUM_DIGITAL_PINS", 0, "Digital inputs/outputs")
+        self.add_item(SectionType.PINS, "NUM_ANALOG_INPUTS", 0, "ADC inputs")
+        self.add_item(SectionType.PINS, "NUM_ANALOG_OUTPUTS", 0, "PWM & DAC outputs")
 
-        analog_alias = []
+        # { role_type: { index: { signal: [...pin_numbers] } } }
+        ports: dict[RoleType, dict[int, dict[str, list[int]]]] = {}
+        for role_type in PORT_SIGNALS.keys():
+            ports[role_type] = {}
+        max_pin_number = 0
 
         for pin in pcb.pinout.values():
-            pin_digital = pin.get(RoleType.ARD_D, None)
-            pin_analog = pin.get(RoleType.ARD_A, None)
-            c_name = pin.get(RoleType.C_NAME, None)
-            gpio = pin.get(RoleType.GPIO, None)
-            adc = pin.get(RoleType.ADC, None)
+            pin_tuple = self.read_pin(pin)
+            if not pin_tuple:
+                continue
+            pin_name, c_name, pin_number = pin_tuple
 
-            comment = []
-            role_text = []
-            hidden = ["ARD_A", "ARD_D", "IO", "C_NAME"]
-            for role_type, roles in pin.items():
-                if role_type.name in hidden:
+            arduino_name = None
+            ard_d = pin.get(RoleType.ARD_D, None)
+            ard_a = pin.get(RoleType.ARD_A, None)
+            if ard_d:
+                self.add_item(SectionType.ARDUINO, f"PIN_{ard_d}", pin_number, c_name)
+                self.static_pins[ard_d] = f"PIN_{ard_d}"
+                arduino_name = ard_d
+            if ard_a:
+                self.add_item(SectionType.ARDUINO, f"PIN_{ard_a}", pin_number, c_name)
+                self.static_pins[ard_a] = f"PIN_{ard_a}"
+                arduino_name = arduino_name or ard_a
+
+            if not arduino_name:
+                continue
+            self.gpio_map[pin_number] = arduino_name
+            max_pin_number = max(max_pin_number, pin_number)
+
+            pin_comment = []
+            for role_type, values in pin.items():
+                if role_type.name in ROLES_HIDDEN:
                     continue
                 role = self.core.role(role_type)
-                if role:
-                    comment += role.format(roles, long=True, hidden=hidden)
-                    if role_type in macro_roles:
-                        role_text += role.format(roles, long=False, hidden=hidden)
-            comment = ", ".join(comment)
+                if not role:
+                    continue
+                pin_comment += role.format(values, long=True, hidden=ROLES_HIDDEN)
+                if role_type not in MACROS_ROLES:
+                    continue
+                roles_short = role.format(values, long=False, hidden=ROLES_HIDDEN)
+                for text in roles_short:
+                    self.add_item(SectionType.MACROS, f"PIN_{text}", pin_number, c_name)
+            pin_comment = ", ".join(pin_comment)
 
-            if pin_digital:
-                pin_name = pin_digital
-                added = self.add_pin(pin_name, c_name or gpio, comment)
-            elif pin_analog:
-                pin_name = pin_analog
-                added = self.add_pin(pin_name, c_name or str(adc), comment)
-            else:
-                continue
-
-            # add pin role short names to generate macros
-            self.add_pin_roles(pin_name, *role_text)
-
-            if added:
+            # add the pin to the list
+            new_added = self.add_pin(arduino_name, c_name, pin_comment)
+            # calculate new counters
+            if new_added:
                 self.increment_item(SectionType.PINS, "PINS_COUNT")
-
-            if pin_digital:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_GPIO)
-                if added:
+                if RoleType.ARD_D in pin:
                     self.increment_item(SectionType.PINS, "NUM_DIGITAL_PINS")
-            if pin_analog:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_ADC)
-                if added:
+                if RoleType.ARD_A in pin:
                     self.increment_item(SectionType.PINS, "NUM_ANALOG_INPUTS")
-                self.add_item(SectionType.ANALOG, f"PIN_{pin_analog}", pin_name)
-                analog_alias.append(pin_analog)
+                if RoleType.PWM in pin:
+                    self.increment_item(SectionType.PINS, "NUM_ANALOG_OUTPUTS")
 
+            # add roles for the pin
+            for role_type in pin.keys():
+                if role_type not in FEATURE_MAP:
+                    continue
+                self.add_pin_feature(arduino_name, FEATURE_MAP[role_type])
+
+            # find all indexed interfaces this pin belongs to
             for role_type, roles in pin.items():
-                if role_type not in interfaces:
+                if role_type not in ports:
                     continue
                 if not isinstance(roles, list):
                     roles = [str(roles)]
@@ -110,109 +158,41 @@ class VariantWriter(VariantParts):
                     if not role[0].isnumeric() or role[1] != "_":
                         continue
                     (index, _, port) = role.partition("_")
-                    if index not in interfaces[role_type]:
-                        interfaces[role_type][index] = {}
-                    if port not in interfaces[role_type][index]:
-                        interfaces[role_type][index][port] = []
-                    interfaces[role_type][index][port].append(pin_name)
+                    index = int(index)
+                    if index not in ports[role_type]:
+                        ports[role_type][index] = {}
+                    if port not in ports[role_type][index]:
+                        ports[role_type][index][port] = []
+                    ports[role_type][index][port].append(pin_number)
 
-            if RoleType.PWM in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_PWM)
-            if RoleType.I2C in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_I2C)
-            if RoleType.I2S in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_I2S)
-            if RoleType.IRQ in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_IRQ)
-            if RoleType.JTAG in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_JTAG)
-            if RoleType.SPI in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_SPI)
-            if RoleType.SWD in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_SWD)
-            if RoleType.UART in pin:
-                self.add_pin_feature(pin_name, PinFeatures.PIN_UART)
-
-        self.add_item(SectionType.PINS, "NUM_ANALOG_OUTPUTS", 0)
-
-        for alias in analog_alias:
-            self.add_item(SectionType.ANALOG, alias, f"PIN_{alias}")
-
-        has_interfaces = set()
-
-        for role_type, intfs in interfaces.items():
-            section = interface_sections[role_type]
-            count = 0
-            items = {}
-            for idx in sorted(intfs.keys()):
-                ports = intfs[idx]
-                if not all(port in ports for port in interface_ports[role_type]):
+        # { role_type: { index: { signal: [...pin_numbers] } } }
+        for role_type, interfaces in ports.items():
+            section = SECTION_MAP[role_type]
+            for index, signals in interfaces.items():
+                if not all(s in signals for s in PORT_SIGNALS[role_type]):
                     # skip incomplete ports (i.e. only SDA1 available)
                     continue
-                count += 1
-                for port in sorted(ports.keys()):
-                    pins = ports[port]
-                    has_interfaces.add(f"{section.name}{idx}")
-                    key = f"PIN_{section.name}{idx}_{port}"
-                    if len(pins) > 1:
-                        for i, pin in enumerate(pins):
-                            items[f"{key}_{i}"] = pin
+                self.increment_item(
+                    SectionType.PORTS,
+                    f"{section.name}_INTERFACES_COUNT",
+                )
+                for signal, pin_numbers in signals.items():
+                    self.add_item(SectionType.PORTS, f"HAS_{section.name}{index}", 1)
+                    key = f"PIN_{section.name}{index}_{signal}"
+                    if len(pin_numbers) > 1:
+                        for i, pin in enumerate(pin_numbers):
+                            c_name = self.pins[self.gpio_map[pin]][0]
+                            self.add_item(section, f"{key}_{i}", pin, c_name)
                     else:
-                        items[key] = pins[0]
-            self.add_item(section, f"{section.name}_INTERFACES_COUNT", count)
-            for key, value in items.items():
-                self.add_item(section, key, value)
+                        c_name = self.pins[self.gpio_map[pin_numbers[0]]][0]
+                        self.add_item(section, key, pin_numbers[0], c_name)
 
-        for name in sorted(has_interfaces):
-            self.add_item(SectionType.PORTS, f"HAS_{name}", 1)
-
-        self.prepare_data()
-
-    def prepare_data(self):
-        pins_d = []
-        pins_a = []
-        pins_idx = {}
-        for name in sorted(self.pins.keys(), key=lambda x: int(x[1:])):
-            (gpio, features, comment, roles) = self.pins[name]
-            if name[0] == "D":
-                pins_d.append((name, gpio, features, comment, roles))
-            if name[0] == "A":
-                pins_a.append((name, gpio, features, comment, roles))
-        self.sorted_pins = pins_d + pins_a
-
-        pin_macros: list[tuple[str, str]] = []
-        for i, (name, gpio, _, _, roles) in enumerate(self.sorted_pins):
-            pins_idx[name] = (i, gpio)
-            for role in roles:
-                pin_macros.append((role, name))
-
-        # find all pins with duplicate roles (i.e. PWM0==2 and PWM0==10)
-        # remove entire role types if found
-        to_remove = set()
-        for role, name in pin_macros:
-            if sum(1 for x in pin_macros if x[0] == role) > 1:
-                to_remove.add(re.sub(r"[\d]", "", role))
-        for role in to_remove:
-            pin_macros = [m for m in pin_macros if not m[0].startswith(role)]
-
-        # add macros for pin functions
-        for role, name in pin_macros:
-            self.add_item(SectionType.MACROS, f"PIN_{role}", name)
-        # sort the macros naturally
-        natsort_key = natsort_keygen()
-        self.sections.get(SectionType.MACROS, []).sort(key=natsort_key)
-
-        self.sorted_sections = []
-        for type in SectionType:
-            if type not in self.sections:
-                continue
-            section = self.sections[type]
-            for i, (key, value, _) in enumerate(section):
-                if not key.startswith("PIN_"):
-                    continue
-                (idx, gpio) = pins_idx[value]
-                section[i] = (key, f"{idx}u", gpio)
-            self.sorted_sections.append((type, self.sections[type]))
+        self.add_item(
+            SectionType.PINS,
+            "PINS_GPIO_MAX",
+            max_pin_number,
+            "Last usable GPIO number",
+        )
 
     def save_h(self, output: str, board_name: str):
         os.makedirs(dirname(output), exist_ok=True)
@@ -226,7 +206,7 @@ class VariantWriter(VariantParts):
             ]
             f.write("\n".join(lines))
 
-    def save_cpp(self, output: str, board_name: str):
+    def save_c(self, output: str, board_name: str):
         os.makedirs(dirname(output), exist_ok=True)
         with open(output, "w", encoding="utf-8") as f:
             lines = [
@@ -234,15 +214,11 @@ class VariantWriter(VariantParts):
                 "",
                 "#include <Arduino.h>",
                 "",
-                'extern "C" {',
-                "",
                 "#ifdef LT_VARIANT_INCLUDE",
                 "#include LT_VARIANT_INCLUDE",
                 "#endif",
                 "",
                 self.format_pins(),
-                "",
-                '} // extern "C"',
                 "",
             ]
             f.write("\n".join(lines))
