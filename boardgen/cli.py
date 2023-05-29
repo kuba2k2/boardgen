@@ -288,7 +288,7 @@ def all(
 @click.option("--no-docs", "-D", is_flag=True, help="Write variant files only")
 @click.pass_context
 def ltci(ctx, no_docs: bool):
-    """Generate board files for LibreTuya CI"""
+    """Generate board files for LibreTiny CI"""
     if not isfile("families.json"):
         print("Run this command in LT root directory")
         exit(1)

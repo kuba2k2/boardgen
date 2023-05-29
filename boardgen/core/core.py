@@ -22,7 +22,7 @@ from .getters import CoreGetters
 
 class Core(CoreCache, CoreGetters):
     shape_ctors: dict[ShapeType, type]
-    is_libretuya: bool = False
+    is_libretiny: bool = False
 
     _dir_base: str
     _dirs_boards: list[str]
@@ -56,7 +56,7 @@ class Core(CoreCache, CoreGetters):
             ShapeType.SUBSHAPE: ShapeGroup,
             ShapeType.TEXT: Text,
         }
-        self.is_libretuya = isfile(
+        self.is_libretiny = isfile(
             join(dirname(__file__), "..", "..", "..", "..", "platform.json")
         ) or isfile("families.json")
 

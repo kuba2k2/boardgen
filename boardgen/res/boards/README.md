@@ -1,3 +1,3 @@
 # Boards
 
-Refer to [libretuya/boards](https://github.com/kuba2k2/libretuya/tree/master/boards) for examples.
+Refer to [libretiny/boards](https://github.com/kuba2k2/libretiny/tree/master/boards) for examples.

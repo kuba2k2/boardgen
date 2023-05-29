@@ -44,7 +44,7 @@ Commands:
 
 Writing board definitions means putting a .JSON file to a directory and specifying this directory using the `--boards` option.
 
-Boardgen is meant to be used with PlatformIO-style board definition files. An example of such a board can be found [here (libretuya/boards/wr3.json)](https://github.com/kuba2k2/libretuya/blob/master/boards/wr3.json).
+Boardgen is meant to be used with PlatformIO-style board definition files. An example of such a board can be found [here (libretiny/boards/wr3.json)](https://github.com/kuba2k2/libretiny/blob/master/boards/wr3.json).
 
 Note that the board manifest uses `"_base"` definitions. These are merged recursively with the manifest, and this result is expected to produce a complete file.
 
@@ -138,4 +138,4 @@ Each shape is a JSON object, which has a common set of attributes:
 
 ## Support
 
-As this project is just a quick solution that'll be used in [LibreTuya](https://github.com/kuba2k2/libretuya) for generating pinouts, it's not really well documented. If you find this project interesting and need any help using it, feel free to open an issue and I'll try to provide more examples and info on how to use it.
+As this project is just a quick solution that'll be used in [LibreTiny](https://github.com/kuba2k2/libretiny) for generating pinouts, it's not really well documented. If you find this project interesting and need any help using it, feel free to open an issue and I'll try to provide more examples and info on how to use it.

@@ -83,18 +83,18 @@ class ReadmeWriter(ReadmeParts):
         # Usage
         self.add_heading("Usage", 2)
         self.add_text("**Board code:**", f"`{board.id}`")
-        if self.core.is_libretuya:
+        if self.core.is_libretiny:
             self.add_text("In `platformio.ini`:")
             code = [
                 f"[env:{board.id}]",
-                "platform = libretuya",
+                "platform = libretiny",
                 f"board = {board.id}",
                 "framework = arduino",
             ]
             self.add_code(code, lang="ini")
             self.add_text("In ESPHome YAML:")
             code = [
-                "libretuya:",
+                "libretiny:",
                 "  board: " + board.id,
                 "  framework:",
                 "    version: dev",
