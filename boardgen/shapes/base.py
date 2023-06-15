@@ -1,6 +1,7 @@
 # Copyright (c) Kuba Szczodrzyński 2022-05-11.
 
 import json
+from copy import deepcopy
 from typing import Any
 
 from pydantic.color import Color
@@ -43,7 +44,7 @@ class Shape(Model, HasId):
         # offset: tuple[float, float] = None,
     ) -> "Shape":
         # do not modify source object
-        data = dict(data)
+        data = deepcopy(data)
         # allow includes without specified type
         if "type" not in data and "name" in data:
             data["type"] = "include"

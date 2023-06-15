@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+	<object class="wxPanel" name="EditPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<object class="wxBoxSizer" name="box_sizer">
+			<orient>wxVERTICAL</orient>
+			<object class="sizeritem">
+				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText">
+					<label>Select item to edit</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxComboBox" name="combo_edit_item">
+					<style>wxCB_READONLY</style>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>0</border>
+				<option>2</option>
+				<object class="wxBoxSizer" name="box_sizer_2">
+					<orient>wxVERTICAL</orient>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText_3">
+					<label>Data</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxTextCtrl" name="input_path">
+					<style>wxTE_READONLY</style>
+					<font>
+						<size>10</size>
+						<face>Courier New</face>
+					</font>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<option>3</option>
+				<object class="wxTextCtrl" name="input_data">
+					<style>wxTE_MULTILINE</style>
+					<font>
+						<size>10</size>
+						<face>Courier New</face>
+					</font>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>0</border>
+				<option>1</option>
+				<object class="wxBoxSizer" name="box_sizer_3">
+					<orient>wxHORIZONTAL</orient>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>0</border>
+						<option>1</option>
+						<object class="wxBoxSizer" name="box_sizer_4">
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+								<border>5</border>
+								<object class="wxStaticText" name="m_staticText_4">
+									<label>Default variables</label>
+									<wrap>-1</wrap>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxEXPAND</flag>
+								<border>5</border>
+								<option>1</option>
+								<object class="wxTextCtrl" name="input_vars">
+									<value>MASK__PRESET=mask__blue__light
+TRACE__COLOR=#58839B
+SILK__COLOR=white
+PINTYPE__VERT=pin__vert__2mm__cast__nohole
+PINTYPE__HORZ=pin__horz__2mm__cast__nohole
+SYMBOL=dummy</value>
+									<style>wxTE_MULTILINE|wxTE_DONTWRAP</style>
+									<value>MASK__PRESET=mask__blue__light
+TRACE__COLOR=#58839B
+SILK__COLOR=white
+PINTYPE__VERT=pin__vert__2mm__cast__nohole
+PINTYPE__HORZ=pin__horz__2mm__cast__nohole
+SYMBOL=dummy</value>
+									<font>
+										<size>9</size>
+										<face>Courier New</face>
+									</font>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>0</border>
+						<option>1</option>
+						<object class="wxBoxSizer" name="box_sizer_5">
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+								<border>5</border>
+								<object class="wxStaticText" name="m_staticText_2">
+									<label>Drawing errors</label>
+									<wrap>-1</wrap>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxEXPAND</flag>
+								<border>5</border>
+								<option>1</option>
+								<object class="wxTextCtrl" name="input_error">
+									<style>wxTE_MULTILINE|wxTE_READONLY</style>
+									<font>
+										<size>9</size>
+										<face>Courier New</face>
+									</font>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+		</object>
+	</object>
+	<object class="wxPanel" name="PreviewPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<object class="wxBoxSizer" name="box_sizer">
+			<orient>wxVERTICAL</orient>
+			<object class="sizeritem">
+				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText">
+					<label>Boards, templates, shapes</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxComboBox" name="combo_preview_item">
+					<style>wxCB_READONLY</style>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText">
+					<label>Preview</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<option>1</option>
+				<object class="wxPanel" name="preview_panel">
+					<style>wxTAB_TRAVERSAL</style>
+					<object class="wxBoxSizer" name="panel_sizer">
+						<orient>wxVERTICAL</orient>
+					</object>
+				</object>
+			</object>
+		</object>
+	</object>
+</resource>

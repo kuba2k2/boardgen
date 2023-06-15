@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wxUiEditorData
+  data_version="15">
+  <node
+    class="Project">
+    <node
+      class="PanelForm"
+      base_file="leftpanel_base"
+      class_name="EditPanel"
+      derived_class_name="LeftPanelDerived"
+      derived_file="leftpanel_derived"
+      mockup_size="500,200">
+      <node
+        class="wxBoxSizer"
+        orientation="wxVERTICAL"
+        flags="wxEXPAND">
+        <node
+          class="wxStaticText"
+          label="Select item to edit"
+          borders="wxTOP|wxRIGHT|wxLEFT" />
+        <node
+          class="wxComboBox"
+          style="wxCB_READONLY"
+          var_name="combo_edit_item"
+          flags="wxEXPAND" />
+        <node
+          class="wxBoxSizer"
+          orientation="wxVERTICAL"
+          var_name="box_sizer_2"
+          border_size="0"
+          flags="wxEXPAND"
+          proportion="2" />
+        <node
+          class="wxStaticText"
+          label="Data"
+          var_name="m_staticText_3"
+          borders="wxTOP|wxRIGHT|wxLEFT" />
+        <node
+          class="wxTextCtrl"
+          style="wxTE_READONLY"
+          var_name="input_path"
+          font="Courier New,10"
+          flags="wxEXPAND" />
+        <node
+          class="wxTextCtrl"
+          style="wxTE_MULTILINE"
+          var_name="input_data"
+          font="Courier New,10"
+          flags="wxEXPAND"
+          proportion="3" />
+        <node
+          class="wxBoxSizer"
+          var_name="box_sizer_3"
+          border_size="0"
+          flags="wxEXPAND"
+          proportion="1">
+          <node
+            class="wxBoxSizer"
+            orientation="wxVERTICAL"
+            var_name="box_sizer_4"
+            border_size="0"
+            flags="wxEXPAND"
+            proportion="1">
+            <node
+              class="wxStaticText"
+              label="Default variables"
+              var_name="m_staticText_4"
+              borders="wxTOP|wxRIGHT|wxLEFT" />
+            <node
+              class="wxTextCtrl"
+              style="wxTE_MULTILINE|wxTE_DONTWRAP"
+              value="MASK__PRESET=mask__blue__light&#10;TRACE__COLOR=#58839B&#10;SILK__COLOR=white&#10;PINTYPE__VERT=pin__vert__2mm__cast__nohole&#10;PINTYPE__HORZ=pin__horz__2mm__cast__nohole&#10;SYMBOL=dummy"
+              var_name="input_vars"
+              font="Courier New,9"
+              flags="wxEXPAND"
+              proportion="1" />
+          </node>
+          <node
+            class="wxBoxSizer"
+            orientation="wxVERTICAL"
+            var_name="box_sizer_5"
+            border_size="0"
+            flags="wxEXPAND"
+            proportion="1">
+            <node
+              class="wxStaticText"
+              label="Drawing errors"
+              var_name="m_staticText_2"
+              borders="wxTOP|wxRIGHT|wxLEFT" />
+            <node
+              class="wxTextCtrl"
+              style="wxTE_MULTILINE|wxTE_READONLY"
+              var_name="input_error"
+              font="Courier New,9"
+              flags="wxEXPAND"
+              proportion="1" />
+          </node>
+        </node>
+      </node>
+    </node>
+    <node
+      class="PanelForm"
+      base_file="previewpanel_base"
+      class_name="PreviewPanel"
+      derived_class_name="PreviewPanelDerived"
+      derived_file="previewpanel_derived"
+      mockup_size="500,200">
+      <node
+        class="wxBoxSizer"
+        orientation="wxVERTICAL"
+        flags="wxEXPAND">
+        <node
+          class="wxStaticText"
+          label="Boards, templates, shapes"
+          borders="wxTOP|wxRIGHT|wxLEFT" />
+        <node
+          class="wxComboBox"
+          style="wxCB_READONLY"
+          var_name="combo_preview_item"
+          flags="wxEXPAND" />
+        <node
+          class="wxStaticText"
+          label="Preview"
+          borders="wxTOP|wxRIGHT|wxLEFT" />
+        <node
+          class="wxPanel"
+          var_name="preview_panel"
+          window_style="wxTAB_TRAVERSAL"
+          flags="wxEXPAND"
+          proportion="1">
+          <node
+            class="wxBoxSizer"
+            orientation="wxVERTICAL"
+            var_name="panel_sizer" />
+        </node>
+      </node>
+    </node>
+  </node>
+</wxUiEditorData>

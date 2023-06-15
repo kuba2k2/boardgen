@@ -2,11 +2,12 @@
 
 import json
 import re
+from copy import deepcopy
 from importlib.metadata import version
 from os.path import dirname, isfile, join
 
 from ..mixins import HasId, ParentType
-from ..models import Board, FlashRegion, Pcb, Role, RoleType, ShapeType, Side, Template
+from ..models import Board, FlashRegion, Pcb, RoleType, ShapeType, Side, Template
 from ..models.enums import RoleValue
 from ..shapes.base import Shape
 from ..shapes.circle import Circle
@@ -14,7 +15,7 @@ from ..shapes.group import ShapeGroup
 from ..shapes.label import Label
 from ..shapes.rect import Rect
 from ..shapes.text import Text
-from ..utils import load_json, var
+from ..utils import var
 from ..vector import V
 from .cache import CoreCache
 from .getters import CoreGetters
@@ -28,11 +29,6 @@ class Core(CoreCache, CoreGetters):
     _dirs_boards: list[str]
     _dirs_shapes: list[str]
     _dirs_templates: list[str]
-    _file_presets: str
-    _file_roles: str
-    _presets: dict[str, dict] = None
-    _roles: dict[RoleType, Role] = None
-    _flash: dict[str, str] = None
 
     def __init__(self) -> None:
         self._dir_base = join(dirname(__file__), "..", "res")
@@ -101,11 +97,11 @@ class Core(CoreCache, CoreGetters):
         flash: dict = None,
     ):
         if presets:
-            self.presets |= presets
+            self.presets.update(presets)
         if roles:
-            self.roles |= roles
+            self.roles.update(roles)
         if flash:
-            self.flash |= flash
+            self.flash.update(flash)
 
     def build_shapes(self, name: str, parent: ParentType, pos: V = None) -> list[Shape]:
         """Load the specified shape JSON into a list of Shape objects.
@@ -151,6 +147,7 @@ class Core(CoreCache, CoreGetters):
             name (str): Board name.
         """
         manifest = self.load_board(name)
+        manifest = deepcopy(manifest)
         pcb = manifest.get("pcb", None)
         pinout = pcb.get("pinout", None) if pcb else None
         ic_pins = pcb.get("ic", None) if pcb else None
