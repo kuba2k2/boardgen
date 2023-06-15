@@ -6,13 +6,11 @@ from os.path import isfile, join
 import click
 from click import echo
 from devtools import debug
-from svgwrite import Drawing, shapes
-from svgwrite.utils import AutoID
 
 from . import Core
-from .models import Board, Side, Template
+from .draw_util import draw_shapes, get_pcb_images
+from .models import Board, Template
 from .readme.writer import ReadmeWriter
-from .shapes.label import Label
 from .utils import load_json
 from .variant.writer import VariantWriter
 from .vector import V
@@ -80,7 +78,8 @@ def cli(
 @click.option(
     "--scale",
     "-s",
-    default=12,
+    default=None,
+    type=float,
     help="Diagram size (bigger if scale larger); 0 means automatic",
 )
 @click.option(
@@ -115,8 +114,6 @@ def draw(
     if output:
         os.makedirs(output, exist_ok=True)
 
-    sides = [Side.FRONT, Side.BACK]
-
     scale_arg = scale
 
     for board in boards:
@@ -127,74 +124,14 @@ def draw(
         echo(f"Drawing '{board.name}'...")
 
         pcb = board.pcb
-        images = []
 
-        AutoID._set_value(1)
-        dwg = Drawing(size=px_size.tuple)
-
-        scale = scale_arg
-        if pcb.scale and pcb.scale < scale:
-            scale = pcb.scale
-
-        for side in sides:
-            try:
-                (pcb_pos1, pcb_pos2) = pcb.get_pos(side)
-            except ValueError:
-                continue
-            labels_list = []
-            size = pcb_pos2 - pcb_pos1
-            pos1 = pcb_pos1
-            if labels:
-                (labels_list, labels_pos1, labels_pos2) = core.build_labels(pcb, side)
-                if labels_list:
-                    pos1 = V(
-                        min(pcb_pos1.x, labels_pos1.x), min(pcb_pos1.y, labels_pos1.y)
-                    )
-                    pos2 = V(
-                        max(pcb_pos2.x, labels_pos2.x), max(pcb_pos2.y, labels_pos2.y)
-                    )
-                    size = pos2 - pos1
-                else:
-                    continue
-            images += [
-                (side, pos1, size, labels_list),
-            ]
-
-        # stack horizontally
-        part_size = V(px_size.x / len(images), px_size.y)
-        part_pos = [V(part_size.x * i, 0) for i in range(len(images))]
-
-        if scale:
-            vb_size = px_size / scale
+        if scale_arg is None:
+            scale = pcb.scale or 12
         else:
-            scale = 99999
-            size_pad = part_size * 0.90  # 5% padding from each side
-            for _, _, size, _ in images:
-                scale = min(scale, size_pad.x / size.x, size_pad.y / size.y)
-            echo(" - calculated scale: %.2f" % scale)
-            vb_size = px_size / scale
+            scale = scale_arg
 
-        dwg.viewbox(width=vb_size.x, height=vb_size.y)
-
-        if canvas:
-            bg = shapes.Rect(insert=(0, 0), size=vb_size.tuple)
-            bg.fill(color="white")
-            bg.stroke(color="black", width=0.1)
-            dwg.add(bg)
-
-        for i, (side, pos1, size, labels_list) in enumerate(images):
-            pcb_pos = ((part_size / scale) - size) / 2
-            pcb_pos += part_pos[i] / scale
-            pcb_pos -= pos1
-            if canvas:
-                pcb_pos.x -= 0.05
-            pcb.draw(dwg, side, pcb_pos)
-            if labels:
-                for label in labels_list:
-                    label: Label
-                    label.move(pcb_pos)
-                    label.draw(dwg)
-                    label.move(-pcb_pos)
+        images = get_pcb_images(core, pcb, labels)
+        dwg = draw_shapes(px_size, scale, images, canvas)
 
         svg = join(output, f"{board.id}.svg")
         if subdir:

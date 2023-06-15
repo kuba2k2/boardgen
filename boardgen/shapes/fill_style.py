@@ -5,14 +5,14 @@ from svgwrite import Drawing
 from svgwrite.gradients import LinearGradient
 from svgwrite.mixins import Presentation
 
-from ..utils import Model
+from ..utils import EvalFloat, Model
 from ..vector import V
 
 
 class FillStyle(Model):
     color: Color = None
     lgrad: tuple[V, Color, V, Color] = None
-    width: float = None
+    width: EvalFloat = None
 
     def apply_to(self, dwg: Drawing, el: Presentation, stroke: bool = False):
         color = None

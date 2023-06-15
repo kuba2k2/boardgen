@@ -8,7 +8,7 @@ from svgwrite import Drawing
 
 from ..mixins import HasId, HasVars
 from ..models.enums import LabelDir, RoleType, ShapeType
-from ..utils import Model, splitxy, var
+from ..utils import EvalFloat, Model, splitxy, var
 from ..vector import V
 
 
@@ -30,7 +30,7 @@ class Shape(Model, HasId):
 
     # for pad labels
     label_dir: LabelDir = None
-    label_size: float = None
+    label_size: EvalFloat = None
 
     def draw(self, dwg: Drawing):
         raise NotImplementedError()

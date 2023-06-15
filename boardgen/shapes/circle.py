@@ -2,13 +2,14 @@
 
 from svgwrite import Drawing, shapes
 
+from ..utils import EvalFloat
 from .base import Shape
 from .fill_style import FillStyle
 
 
 class Circle(Shape):
-    r: float = None
-    d: float = None
+    r: EvalFloat = None
+    d: EvalFloat = None
     fill: FillStyle = None
     stroke: FillStyle = None
 

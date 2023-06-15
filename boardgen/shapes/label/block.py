@@ -7,6 +7,7 @@ from svgwrite.container import Group
 from svgwrite.shapes import Rect
 from svgwrite.text import Text
 
+from ...utils import EvalFloat
 from ...vector import V
 from ..base import LabelShape
 
@@ -14,8 +15,8 @@ from ..base import LabelShape
 class Block(LabelShape):
     text: str
     padding: V = V(0.1, 0.2)
-    radius: float = 0.3
-    angle: float = 15
+    radius: EvalFloat = 0.3
+    angle: EvalFloat = 15
 
     def draw(self, dwg: Drawing):
         g = Group()

@@ -3,6 +3,7 @@
 from pydantic import Field
 from svgwrite import Drawing, shapes
 
+from ..utils import EvalFloat
 from ..vector import V
 from .base import Shape
 from .fill_style import FillStyle
@@ -10,8 +11,8 @@ from .fill_style import FillStyle
 
 class Rect(Shape):
     size_v: V = Field(alias="size")
-    rx: float = None
-    ry: float = None
+    rx: EvalFloat = None
+    ry: EvalFloat = None
     fill: FillStyle = None
     stroke: FillStyle = None
 

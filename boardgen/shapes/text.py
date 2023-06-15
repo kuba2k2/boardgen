@@ -2,13 +2,14 @@
 
 from svgwrite import Drawing, text
 
+from ..utils import EvalFloat
 from .base import Shape
 from .fill_style import FillStyle
 
 
 class Text(Shape):
     text: str
-    font_size: float
+    font_size: EvalFloat
     fill: FillStyle = None
 
     def draw(self, dwg: Drawing):

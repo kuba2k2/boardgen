@@ -15,6 +15,18 @@ class Model(BaseModel):
         arbitrary_types_allowed = True
 
 
+class EvalFloat(float):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if isinstance(v, str):
+            return str_to_num(v)
+        return float(v)
+
+
 def var(s: str, vars: dict) -> str:
     s_prev = s
     while "${" in s:
