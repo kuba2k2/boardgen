@@ -5,6 +5,55 @@
     class="Project">
     <node
       class="PanelForm"
+      base_file="previewpanel_base"
+      class_name="PreviewPanel"
+      derived_class_name="PreviewPanelDerived"
+      derived_file="previewpanel_derived"
+      mockup_size="500,200">
+      <node
+        class="wxBoxSizer"
+        orientation="wxVERTICAL"
+        flags="wxEXPAND">
+        <node
+          class="wxStaticText"
+          label="Boards, templates, shapes"
+          borders="wxTOP|wxRIGHT|wxLEFT" />
+        <node
+          class="wxBoxSizer"
+          var_name="box_sizer_2"
+          border_size="0"
+          flags="wxEXPAND">
+          <node
+            class="wxComboBox"
+            style="wxCB_READONLY"
+            var_name="combo_preview_item"
+            flags="wxEXPAND"
+            proportion="1" />
+          <node
+            class="wxButton"
+            label="Edit..."
+            var_name="button_edit"
+            flags="wxEXPAND" />
+        </node>
+        <node
+          class="wxStaticText"
+          label="Preview"
+          borders="wxTOP|wxRIGHT|wxLEFT" />
+        <node
+          class="wxPanel"
+          var_name="preview_panel"
+          window_style="wxTAB_TRAVERSAL"
+          flags="wxEXPAND"
+          proportion="1">
+          <node
+            class="wxBoxSizer"
+            orientation="wxVERTICAL"
+            var_name="panel_sizer" />
+        </node>
+      </node>
+    </node>
+    <node
+      class="PanelForm"
       base_file="leftpanel_base"
       class_name="EditPanel"
       derived_class_name="LeftPanelDerived"
@@ -15,21 +64,49 @@
         orientation="wxVERTICAL"
         flags="wxEXPAND">
         <node
-          class="wxStaticText"
-          label="Select item to edit"
-          borders="wxTOP|wxRIGHT|wxLEFT" />
-        <node
-          class="wxComboBox"
-          style="wxCB_READONLY"
-          var_name="combo_edit_item"
-          flags="wxEXPAND" />
-        <node
           class="wxBoxSizer"
-          orientation="wxVERTICAL"
-          var_name="box_sizer_2"
+          var_name="box_sizer_6"
           border_size="0"
-          flags="wxEXPAND"
-          proportion="2" />
+          flags="wxEXPAND">
+          <node
+            class="wxBoxSizer"
+            orientation="wxVERTICAL"
+            var_name="box_sizer_7"
+            border_size="0"
+            flags="wxEXPAND"
+            proportion="1">
+            <node
+              class="wxStaticText"
+              label="Select item to edit"
+              borders="wxTOP|wxRIGHT|wxLEFT" />
+            <node
+              class="wxComboBox"
+              style="wxCB_READONLY"
+              var_name="combo_edit_item"
+              disabled="1"
+              flags="wxEXPAND"
+              proportion="1" />
+          </node>
+          <node
+            class="wxBoxSizer"
+            orientation="wxVERTICAL"
+            var_name="box_sizer_8"
+            border_size="0"
+            flags="wxEXPAND">
+            <node
+              class="wxHyperlinkCtrl"
+              label="Modified: 0"
+              var_name="label_modified"
+              borders="wxTOP|wxRIGHT|wxLEFT" />
+            <node
+              class="wxButton"
+              label="Save all"
+              var_name="button_save"
+              disabled="1"
+              flags="wxEXPAND"
+              proportion="1" />
+          </node>
+        </node>
         <node
           class="wxStaticText"
           label="Data"
@@ -99,40 +176,52 @@
       </node>
     </node>
     <node
-      class="PanelForm"
-      base_file="previewpanel_base"
-      class_name="PreviewPanel"
-      derived_class_name="PreviewPanelDerived"
-      derived_file="previewpanel_derived"
-      mockup_size="500,200">
+      class="MenuBar"
+      class_name="EditMenuBar"
+      base_file="editmenubar_base"
+      derived_class_name="EditMenuBarDerived"
+      derived_file="editmenubar_derived">
       <node
-        class="wxBoxSizer"
-        orientation="wxVERTICAL"
-        flags="wxEXPAND">
+        class="wxMenu"
+        label="Edit..."
+        var_name="menu_edit">
         <node
-          class="wxStaticText"
-          label="Boards, templates, shapes"
-          borders="wxTOP|wxRIGHT|wxLEFT" />
-        <node
-          class="wxComboBox"
-          style="wxCB_READONLY"
-          var_name="combo_preview_item"
-          flags="wxEXPAND" />
-        <node
-          class="wxStaticText"
-          label="Preview"
-          borders="wxTOP|wxRIGHT|wxLEFT" />
-        <node
-          class="wxPanel"
-          var_name="preview_panel"
-          window_style="wxTAB_TRAVERSAL"
-          flags="wxEXPAND"
-          proportion="1">
+          class="submenu"
+          label="New...">
           <node
-            class="wxBoxSizer"
-            orientation="wxVERTICAL"
-            var_name="panel_sizer" />
+            class="submenu"
+            label="Board..."
+            var_name="submenu_2">
+            <node
+              class="wxMenuItem"
+              label="LibreTiny directory"
+              var_name="new_board_lt" />
+            <node
+              class="wxMenuItem"
+              label="boardgen directory"
+              var_name="new_board_res" />
+          </node>
+          <node
+            class="wxMenuItem"
+            label="Template"
+            var_name="new_template" />
+          <node
+            class="wxMenuItem"
+            label="Shape"
+            var_name="new_shape" />
         </node>
+        <node
+          class="wxMenuItem"
+          label="Rename item"
+          var_name="rename" />
+        <node
+          class="wxMenuItem"
+          label="Delete item"
+          var_name="delete" />
+        <node
+          class="wxMenuItem"
+          label="Duplicate item"
+          var_name="duplicate" />
       </node>
     </node>
   </node>

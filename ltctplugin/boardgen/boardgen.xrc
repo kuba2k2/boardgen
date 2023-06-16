@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
-	<object class="wxPanel" name="EditPanel">
+	<object class="wxPanel" name="PreviewPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<object class="wxBoxSizer" name="box_sizer">
 			<orient>wxVERTICAL</orient>
@@ -8,23 +8,111 @@
 				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
 				<border>5</border>
 				<object class="wxStaticText" name="m_staticText">
-					<label>Select item to edit</label>
+					<label>Boards, templates, shapes</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>0</border>
+				<object class="wxBoxSizer" name="box_sizer_2">
+					<orient>wxHORIZONTAL</orient>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<option>1</option>
+						<object class="wxComboBox" name="combo_preview_item">
+							<style>wxCB_READONLY</style>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="button_edit">
+							<label>Edit...</label>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText">
+					<label>Preview</label>
 					<wrap>-1</wrap>
 				</object>
 			</object>
 			<object class="sizeritem">
 				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxComboBox" name="combo_edit_item">
-					<style>wxCB_READONLY</style>
+				<option>1</option>
+				<object class="wxPanel" name="preview_panel">
+					<style>wxTAB_TRAVERSAL</style>
+					<object class="wxBoxSizer" name="panel_sizer">
+						<orient>wxVERTICAL</orient>
+					</object>
 				</object>
 			</object>
+		</object>
+	</object>
+	<object class="wxPanel" name="EditPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<object class="wxBoxSizer" name="box_sizer">
+			<orient>wxVERTICAL</orient>
 			<object class="sizeritem">
 				<flag>wxALL|wxEXPAND</flag>
 				<border>0</border>
-				<option>2</option>
-				<object class="wxBoxSizer" name="box_sizer_2">
-					<orient>wxVERTICAL</orient>
+				<object class="wxBoxSizer" name="box_sizer_6">
+					<orient>wxHORIZONTAL</orient>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>0</border>
+						<option>1</option>
+						<object class="wxBoxSizer" name="box_sizer_7">
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+								<border>5</border>
+								<object class="wxStaticText" name="m_staticText">
+									<label>Select item to edit</label>
+									<wrap>-1</wrap>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxEXPAND</flag>
+								<border>5</border>
+								<option>1</option>
+								<object class="wxComboBox" name="combo_edit_item">
+									<style>wxCB_READONLY</style>
+									<enabled>0</enabled>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>0</border>
+						<object class="wxBoxSizer" name="box_sizer_8">
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<flag>wxTOP|wxRIGHT|wxLEFT</flag>
+								<border>5</border>
+								<object class="wxHyperlinkCtrl" name="label_modified">
+									<label>Modified: 0</label>
+									<style>wxHL_DEFAULT_STYLE</style>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxEXPAND</flag>
+								<border>5</border>
+								<option>1</option>
+								<object class="wxButton" name="button_save">
+									<label>Save all</label>
+									<enabled>0</enabled>
+								</object>
+							</object>
+						</object>
+					</object>
 				</object>
 			</object>
 			<object class="sizeritem">
@@ -136,43 +224,35 @@ SYMBOL=dummy</value>
 			</object>
 		</object>
 	</object>
-	<object class="wxPanel" name="PreviewPanel">
-		<style>wxTAB_TRAVERSAL</style>
-		<object class="wxBoxSizer" name="box_sizer">
-			<orient>wxVERTICAL</orient>
-			<object class="sizeritem">
-				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText">
-					<label>Boards, templates, shapes</label>
-					<wrap>-1</wrap>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxComboBox" name="combo_preview_item">
-					<style>wxCB_READONLY</style>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText">
-					<label>Preview</label>
-					<wrap>-1</wrap>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<option>1</option>
-				<object class="wxPanel" name="preview_panel">
-					<style>wxTAB_TRAVERSAL</style>
-					<object class="wxBoxSizer" name="panel_sizer">
-						<orient>wxVERTICAL</orient>
+	<object class="wxMenuBar" name="EditMenuBar">
+		<object class="wxMenu" name="menu_edit">
+			<label>Edit...</label>
+			<object class="wxMenu" name="submenu">
+				<label>New...</label>
+				<object class="wxMenu" name="submenu_2">
+					<label>Board...</label>
+					<object class="wxMenuItem" name="new_board_lt">
+						<label>LibreTiny directory</label>
+					</object>
+					<object class="wxMenuItem" name="new_board_res">
+						<label>boardgen directory</label>
 					</object>
 				</object>
+				<object class="wxMenuItem" name="new_template">
+					<label>Template</label>
+				</object>
+				<object class="wxMenuItem" name="new_shape">
+					<label>Shape</label>
+				</object>
+			</object>
+			<object class="wxMenuItem" name="rename">
+				<label>Rename item</label>
+			</object>
+			<object class="wxMenuItem" name="delete">
+				<label>Delete item</label>
+			</object>
+			<object class="wxMenuItem" name="duplicate">
+				<label>Duplicate item</label>
 			</object>
 		</object>
 	</object>

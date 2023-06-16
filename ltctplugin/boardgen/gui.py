@@ -56,6 +56,7 @@ class BoardgenPanel(BasePanel):
     draw_object: Board | list[Shape] | Shape
     edit_items: dict[str, tuple[str, dict]] = None
     edit_selection: str = None
+    modified: dict[str, dict] = None
     _vars: dict
 
     def __init__(self, parent: wx.Window, frame):
@@ -92,6 +93,11 @@ class BoardgenPanel(BasePanel):
         self.Vars.Bind(wx.EVT_TEXT, self.OnVarsText)
         self.Path = self.BindTextCtrl("input_path")
         self.Error = self.BindTextCtrl("input_error")
+        self.Save = self.BindButton("button_save", self.OnSaveClick)
+        self.Modified: wx.adv.HyperlinkCtrl = self.BindWindow(
+            "label_modified",
+            (wx.adv.EVT_HYPERLINK, self.OnModifiedClick),
+        )
 
         self.lvm = LVM.get()
         self.core = Core()
@@ -101,6 +107,7 @@ class BoardgenPanel(BasePanel):
         self.file_map = {}
         self.draw_items = {}
         self.edit_items = {}
+        self.modified = {}
 
         self.ReloadLists()
 
@@ -161,6 +168,8 @@ class BoardgenPanel(BasePanel):
                     obj = self.core.load_shape(item_name)
         except Exception as e:
             self.SetError(e)
+            if force_list:
+                self.FillEditList()
             return
         self.vars = obj["vars"] if "vars" in obj else {}
         parent = HasVars(vars=self.vars)
@@ -203,10 +212,13 @@ class BoardgenPanel(BasePanel):
             self.SetError(e)
             if not force_list:
                 return
+        self.FillEditList()
 
+    def FillEditList(self) -> None:
         selection = self.EditItem.GetStringSelection()
         self.EditItem.Clear()
         self.EditItem.Append(list(self.edit_items.keys()))
+        self.EditItem.Enable(True)
         self.EditItem.SetStringSelection(selection)
 
         if not self.EditItem.GetStringSelection():
@@ -221,6 +233,7 @@ class BoardgenPanel(BasePanel):
         value = f"{type}/{name}", data
         self.edit_items[key] = value
         if file:
+            file = abspath(file)
             self.file_map[value[0]] = file
 
     def UpdateEditItem(self) -> None:
@@ -260,7 +273,9 @@ class BoardgenPanel(BasePanel):
             obj = json.loads(text)
             if obj:
                 self.data = obj
-            self.UpdateDrawItem()
+                if self.edit_item:
+                    self.MarkModified()
+            self.UpdateDrawItem(force_list=self.edit_path.startswith("_base"))
         except json.JSONDecodeError:
             return
 
@@ -275,17 +290,55 @@ class BoardgenPanel(BasePanel):
         text = self.Data.GetValue()
         text = text.replace("\n", "\r\n")
         pos = max(0, self.Data.GetInsertionPoint() - 1)
-        path = jsonpath(text, pos)
-        if path:
-            self.Path.ChangeValue(path.replace(".", " -> "))
+        self.edit_path = jsonpath(text, pos) or ""
+        if self.edit_path:
+            self.Path.ChangeValue(self.edit_path.replace(".", " -> "))
         else:
             self.Path.ChangeValue("")
+
+    @on_event
+    def OnSaveClick(self) -> None:
+        self.Modified.SetLabel("Modified: 0")
+        self.Save.Enable(False)
+        if not self.modified:
+            return
+        for file, obj in self.modified.items():
+            path = self.file_map.get(file, None)
+            if not path:
+                warning(f"Couldn't save '{file}' - path is unknown")
+                continue
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(obj, f, indent="\t")
+                f.write("\n")
+        info(f"Saved {len(self.modified)} files")
+        self.modified.clear()
+
+    @on_event
+    def OnModifiedClick(self) -> None:
+        if not self.modified:
+            message = "No files have been modified"
+        else:
+            message = "The following files have been modified:\n\n"
+            for file in sorted(self.modified.keys()):
+                path = self.file_map.get(file, file)
+                message += path + "\n"
+        wx.MessageBox(message, "Information")
 
     def SetError(self, e: Exception | None) -> None:
         if not e:
             self.Error.Clear()
         else:
             self.Error.SetValue(f"{type(e).__name__}: {e}")
+
+    def MarkModified(self) -> None:
+        if not self.edit_item:
+            return
+        file, obj = self.edit_item
+        if file in self.modified:
+            return
+        self.modified[file] = obj
+        self.Modified.SetLabel(f"Modified: {len(self.modified)}")
+        self.Save.Enable(True)
 
     @property
     def vars(self) -> dict[str, str]:
