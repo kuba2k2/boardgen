@@ -125,13 +125,37 @@
 			</object>
 			<object class="sizeritem">
 				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="input_path">
-					<style>wxTE_READONLY</style>
-					<font>
-						<size>10</size>
-						<face>Courier New</face>
-					</font>
+				<border>0</border>
+				<object class="wxBoxSizer" name="box_sizer_2">
+					<orient>wxHORIZONTAL</orient>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<option>1</option>
+						<object class="wxTextCtrl" name="input_path">
+							<style>wxTE_READONLY</style>
+							<font>
+								<size>10</size>
+								<face>Courier New</face>
+							</font>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="button_choose">
+							<label>Choose base</label>
+							<enabled>0</enabled>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="button_format">
+							<label>Beautify</label>
+							<enabled>0</enabled>
+						</object>
+					</object>
 				</object>
 			</object>
 			<object class="sizeritem">

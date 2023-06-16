@@ -25,27 +25,27 @@ class Core(CoreCache, CoreGetters):
     shape_ctors: dict[ShapeType, type]
     is_libretiny: bool = False
 
-    _dir_base: str
+    dir_base: str
     _dirs_boards: list[str]
     _dirs_shapes: list[str]
     _dirs_templates: list[str]
 
     def __init__(self) -> None:
-        self._dir_base = join(dirname(__file__), "..", "res")
+        self.dir_base = join(dirname(__file__), "..", "res")
         self._dirs_boards = [
             join(dirname(__file__), "..", "..", "..", "..", "boards"),
-            join(self._dir_base, "boards"),
+            join(self.dir_base, "boards"),
             "boards",
         ]
         self._dirs_shapes = [
-            join(self._dir_base, "shapes"),
+            join(self.dir_base, "shapes"),
         ]
         self._dirs_templates = [
-            join(self._dir_base, "templates"),
+            join(self.dir_base, "templates"),
         ]
-        self._file_presets = join(self._dir_base, "presets.json")
-        self._file_roles = join(self._dir_base, "roles.json")
-        self._file_flash = join(self._dir_base, "flash.json")
+        self._file_presets = join(self.dir_base, "presets.json")
+        self._file_roles = join(self.dir_base, "roles.json")
+        self._file_flash = join(self.dir_base, "flash.json")
         self.shape_ctors = {
             ShapeType.RECT: Rect,
             ShapeType.CIRCLE: Circle,

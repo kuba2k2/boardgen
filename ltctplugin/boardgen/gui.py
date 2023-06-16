@@ -2,14 +2,15 @@
 
 import json
 from dataclasses import dataclass
-from logging import debug
-from os.path import join
+from enum import Enum, auto
+from logging import debug, info, warning
+from os.path import abspath, join
 
 import wx
 import wx.adv
 import wx.xrc
 from ltchiptool.gui.panels.base import BasePanel
-from ltchiptool.gui.utils import with_event
+from ltchiptool.gui.utils import on_event, with_event
 from ltchiptool.util.lvm import LVM
 
 from boardgen import Core, HasVars, V
@@ -19,6 +20,34 @@ from boardgen.shapes import Shape, ShapeGroup
 
 from .svg import SvgPanel
 from .utils import jsonpath
+
+INIT_BOARD = {
+    "_base": [],
+    "build": {
+        "mcu": "",
+        "variant": "",
+    },
+    "name": "",
+    "url": "",
+    "vendor": "",
+    "doc": {
+        "fccid": "",
+    },
+    "pcb": {
+        "symbol": "",
+    },
+}
+INIT_TEMPLATE = {
+    "name": "",
+    "title": "",
+    "width": 10,
+    "height": 10,
+    "front": [],
+    "back": [],
+    "pads": {},
+    "test_pads": {},
+}
+INIT_SHAPE = []
 
 
 @dataclass
@@ -56,6 +85,8 @@ class BoardgenPanel(BasePanel):
     draw_object: Board | list[Shape] | Shape
     edit_items: dict[str, tuple[str, dict]] = None
     edit_selection: str = None
+    edit_path: str = ""
+    edit_errors: bool = False
     modified: dict[str, dict] = None
     _vars: dict
 
@@ -94,6 +125,8 @@ class BoardgenPanel(BasePanel):
         self.Path = self.BindTextCtrl("input_path")
         self.Error = self.BindTextCtrl("input_error")
         self.Save = self.BindButton("button_save", self.OnSaveClick)
+        self.Edit = self.BindButton("button_edit", self.OnEditClick)
+        self.Format = self.BindButton("button_format", self.OnFormatClick)
         self.Modified: wx.adv.HyperlinkCtrl = self.BindWindow(
             "label_modified",
             (wx.adv.EVT_HYPERLINK, self.OnModifiedClick),
@@ -125,13 +158,10 @@ class BoardgenPanel(BasePanel):
         items = {}
 
         for board_name in self.core.list_json("boards"):
-            board = self.core.load_board(board_name)
-            items[f"Board - {board['name']}"] = "board", board_name
+            items[f"Board - {board_name}"] = "board", board_name
         for template_name in self.core.list_json("templates"):
-            template = self.core.load_template(template_name)
-            items[f"Template - {template['title']}"] = "template", template_name
+            items[f"Template - {template_name}"] = "template", template_name
         for shape_name in self.core.list_json("shapes"):
-            # shape = self.core.load_shape(shape_name)
             items[f"Shape - {shape_name}"] = "shape", shape_name
 
         self.DrawItem.SetItems(sorted(items.keys()))
@@ -154,7 +184,10 @@ class BoardgenPanel(BasePanel):
                 pass
 
     def UpdateDrawItem(self, force_list: bool = False) -> None:
-        item_type, item_name = self.draw_item
+        item = self.draw_item
+        if not item:
+            return
+        item_type, item_name = item
 
         self.edit_items = {}
         obj: dict = {}
@@ -237,9 +270,14 @@ class BoardgenPanel(BasePanel):
             self.file_map[value[0]] = file
 
     def UpdateEditItem(self) -> None:
-        item_name, obj = self.edit_item
+        item = self.edit_item
+        if not item:
+            return
+        item_name, obj = item
         self.edit_selection = item_name
         self.Data.ChangeValue(json.dumps(obj, indent=4))
+        self.Format.Enable(True)
+        self.UpdateDataPosition()
         if "pcb" in obj:
             obj = obj["pcb"]
         self.vars = obj["vars"] if "vars" in obj else {}
@@ -275,9 +313,10 @@ class BoardgenPanel(BasePanel):
                 self.data = obj
                 if self.edit_item:
                     self.MarkModified()
+            self.edit_errors = False
             self.UpdateDrawItem(force_list=self.edit_path.startswith("_base"))
         except json.JSONDecodeError:
-            return
+            self.edit_errors = True
 
     @with_event
     def OnVarsText(self, event: wx.Event) -> None:
@@ -287,6 +326,9 @@ class BoardgenPanel(BasePanel):
     @with_event
     def OnDataPosition(self, event: wx.Event) -> None:
         event.Skip()
+        self.UpdateDataPosition()
+
+    def UpdateDataPosition(self) -> None:
         text = self.Data.GetValue()
         text = text.replace("\n", "\r\n")
         pos = max(0, self.Data.GetInsertionPoint() - 1)
@@ -323,6 +365,79 @@ class BoardgenPanel(BasePanel):
                 path = self.file_map.get(file, file)
                 message += path + "\n"
         wx.MessageBox(message, "Information")
+
+    @on_event
+    def OnFormatClick(self) -> None:
+        if self.edit_errors:
+            wx.MessageBox(
+                "Can't beautify, the JSON has syntax errors",
+                "Error",
+                wx.OK | wx.CENTRE | wx.ICON_ERROR,
+            )
+            return
+        self.UpdateEditItem()
+
+    @on_event
+    def OnEditClick(self) -> None:
+        bar: wx.MenuBar = self.Xrc.LoadMenuBar("EditMenuBar")
+        menu: wx.Menu = bar.GetMenu(0)
+        menu.Detach()
+        if not self.draw_item:
+            menu.FindItemByPosition(1).Enable(False)
+            menu.FindItemByPosition(2).Enable(False)
+            menu.FindItemByPosition(3).Enable(False)
+        choice = self.Edit.GetPopupMenuSelectionFromUser(menu)
+        item: wx.MenuItem = menu.FindItemById(choice)
+        if not item:
+            return
+        label = item.GetItemLabel()
+        match label:
+            case "LibreTiny directory":
+                self.CreateNewFile(join(self.lvm.path(), "boards"), INIT_BOARD)
+            case "boardgen directory":
+                self.CreateNewFile(join(self.core.dir_base, "boards"), INIT_BOARD)
+            case "Template":
+                self.CreateNewFile(join(self.core.dir_base, "templates"), INIT_TEMPLATE)
+            case "Shape":
+                self.CreateNewFile(join(self.core.dir_base, "shapes"), INIT_SHAPE)
+            # case "Rename item":
+            # case "Delete item":
+            # case "Duplicate item":
+
+    def AskFileName(self, value: str = "") -> str | None:
+        dialog = wx.TextEntryDialog(
+            self,
+            message="Enter the new file name (without .json):",
+            caption="File name",
+            value=value,
+        )
+        if dialog.ShowModal() != wx.ID_OK:
+            dialog.Destroy()
+            return
+        value = dialog.GetValue().strip()
+        dialog.Destroy()
+        return value
+
+    def CreateNewFile(self, directory: str, value: dict | list) -> None:
+        name = self.AskFileName()
+        if not name:
+            return
+
+        if value is INIT_BOARD:
+            value["build"]["variant"] = name
+            value["name"] = name
+        if value is INIT_TEMPLATE:
+            value["name"] = name
+            value["title"] = name
+
+        self.core.clear_cache()
+        with open(join(directory, f"{name}.json"), "w") as f:
+            json.dump(value, f, indent="\t")
+            f.write("\n")
+        self.ReloadLists()
+        self.draw_item = name
+        self.Svg.ClearSvg()
+        self.UpdateDrawItem(force_list=True)
 
     def SetError(self, e: Exception | None) -> None:
         if not e:

@@ -113,11 +113,30 @@
           var_name="m_staticText_3"
           borders="wxTOP|wxRIGHT|wxLEFT" />
         <node
-          class="wxTextCtrl"
-          style="wxTE_READONLY"
-          var_name="input_path"
-          font="Courier New,10"
-          flags="wxEXPAND" />
+          class="wxBoxSizer"
+          var_name="box_sizer_2"
+          border_size="0"
+          flags="wxEXPAND">
+          <node
+            class="wxTextCtrl"
+            style="wxTE_READONLY"
+            var_name="input_path"
+            font="Courier New,10"
+            flags="wxEXPAND"
+            proportion="1" />
+          <node
+            class="wxButton"
+            label="Choose base"
+            var_name="button_choose"
+            disabled="1"
+            flags="wxEXPAND" />
+          <node
+            class="wxButton"
+            label="Beautify"
+            var_name="button_format"
+            disabled="1"
+            flags="wxEXPAND" />
+        </node>
         <node
           class="wxTextCtrl"
           style="wxTE_MULTILINE"

@@ -17,6 +17,10 @@ class CoreCache(ABC):
     }
     json_hook: Optional[Callable[[str, str, dict, Optional[str]], None]] = None
 
+    def clear_cache(self) -> None:
+        for obj in self._cache.values():
+            obj.clear()
+
     def get_dirs(self, type: str) -> list[str]:
         attr_name = f"_dirs_{type}"
         if not hasattr(self, attr_name):
