@@ -2,7 +2,7 @@
 
 from abc import ABC
 from glob import glob
-from os.path import basename, isfile, join
+from os.path import isfile, join, relpath
 from typing import Callable, Optional
 
 from ..utils import load_json, merge_dicts
@@ -27,12 +27,15 @@ class CoreCache(ABC):
             return []
         return getattr(self, attr_name)
 
-    def list_json(self, type: str) -> set[str]:
+    def list_json(self, type: str, recursive: bool = False) -> set[str]:
         dirs = self.get_dirs(type)
         files = set()
         for dir in dirs:
-            for file in glob(join(dir, "*.json")):
-                files.add(basename(file).rpartition(".")[0])
+            for file in glob(
+                join(dir, "**/*.json" if recursive else "*.json"),
+                recursive=recursive,
+            ):
+                files.add(relpath(file, dir).replace("\\", "/").rpartition(".")[0])
         return files
 
     def load_json(self, type: str, name: str) -> dict | None:

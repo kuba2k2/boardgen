@@ -144,7 +144,8 @@
 						<flag>wxALL|wxEXPAND</flag>
 						<border>5</border>
 						<object class="wxButton" name="button_choose">
-							<label>Choose base</label>
+							<label>Click an item...</label>
+							<size>60,-1d</size>
 							<enabled>0</enabled>
 						</object>
 					</object>

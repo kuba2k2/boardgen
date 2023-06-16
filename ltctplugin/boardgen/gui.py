@@ -1,7 +1,6 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-6-3.
 
 import json
-from dataclasses import dataclass
 from enum import Enum, auto
 from logging import debug, info, warning
 from os.path import abspath, join
@@ -9,17 +8,19 @@ from os.path import abspath, join
 import wx
 import wx.adv
 import wx.xrc
+from ltchiptool import Family
 from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event, with_event
 from ltchiptool.util.lvm import LVM
+from ltchiptool.util.obj import get
 
 from boardgen import Core, HasVars, V
 from boardgen.draw_util import draw_shapes, get_pcb_images
-from boardgen.models import Board, Template
+from boardgen.models import Board, RoleType, Template
 from boardgen.shapes import Shape, ShapeGroup
 
 from .svg import SvgPanel
-from .utils import jsonpath
+from .utils import jsonpath, jsonwalk
 
 INIT_BOARD = {
     "_base": [],
@@ -48,35 +49,51 @@ INIT_TEMPLATE = {
     "test_pads": {},
 }
 INIT_SHAPE = []
+ROLE_DEFAULTS: dict[str, str | int | None] = {
+    "ADC": 0,
+    "ARD_A": "A0",
+    "ARD_D": "D0",
+    "CTRL": "CEN",
+    "C_NAME": "GPIO_00",
+    "DVP": "PD0",
+    "FLASH": "^FCS",
+    "GND": None,
+    "GPIO": "P0",
+    "GPIONUM": 35,
+    "I2C": "0_SDA",
+    "I2S": "0_TX",
+    "IC": 1,
+    "IO": "I",
+    "IRDA": None,
+    "IRQ": None,
+    "JTAG": "TMS",
+    "PHYSICAL": 2,
+    "PWM": 1,
+    "PWR": 3.3,
+    "SD": "CMD",
+    "SPI": "0_SCK",
+    "SWD": "DIO",
+    "UART": "1_TX",
+    "USB": "DN",
+    "WAKE": 1,
+}
 
 
-@dataclass
-class EditableShape:
-    prefix: str
-    data: dict
-    shape: Shape = None
-
-    @staticmethod
-    def build(core: Core, _vars: dict, data: dict) -> "EditableShape":
-        _vars |= {"DUMMY": 0}
-        obj = EditableShape(
-            prefix="",
-            data=data,
-        )
-        obj.rebuild(core, _vars)
-        return obj
-
-    def rebuild(self, core: Core, _vars: dict) -> None:
-        self.shape = core.build_shape(parent=HasVars(vars=_vars), data=self.data)
-
-    @property
-    def title(self) -> str:
-        title = self.prefix + type(self.shape).__name__ + str(self.shape.pos.tuple)
-        if self.shape.id:
-            title += " - " + self.shape.id
-        if isinstance(self.shape, ShapeGroup):
-            title = "Shape - " + self.shape.name
-        return title
+class EditType(Enum):
+    # multiple choice
+    BASE = auto()
+    TEMPLATE = auto()
+    CONNECTIVITY = auto()
+    ROLE_HIDDEN = auto()
+    # single choice
+    SHAPE = auto()
+    SHAPE_TYPE = auto()
+    PRESET = auto()
+    FAMILY = auto()
+    ROLE = auto()
+    FLASH = auto()
+    # other
+    COLOR = auto()
 
 
 class BoardgenPanel(BasePanel):
@@ -87,6 +104,7 @@ class BoardgenPanel(BasePanel):
     edit_selection: str = None
     edit_path: str = ""
     edit_errors: bool = False
+    edit_type: EditType | None = None
     modified: dict[str, dict] = None
     _vars: dict
 
@@ -127,6 +145,7 @@ class BoardgenPanel(BasePanel):
         self.Save = self.BindButton("button_save", self.OnSaveClick)
         self.Edit = self.BindButton("button_edit", self.OnEditClick)
         self.Format = self.BindButton("button_format", self.OnFormatClick)
+        self.Choose = self.BindButton("button_choose", self.OnChooseClick)
         self.Modified: wx.adv.HyperlinkCtrl = self.BindWindow(
             "label_modified",
             (wx.adv.EVT_HYPERLINK, self.OnModifiedClick),
@@ -269,13 +288,15 @@ class BoardgenPanel(BasePanel):
             file = abspath(file)
             self.file_map[value[0]] = file
 
-    def UpdateEditItem(self) -> None:
+    def UpdateEditItem(self, cursor_pos: int = None) -> None:
         item = self.edit_item
         if not item:
             return
         item_name, obj = item
         self.edit_selection = item_name
         self.Data.ChangeValue(json.dumps(obj, indent=4))
+        if cursor_pos is not None:
+            self.Data.SetInsertionPoint(cursor_pos)
         self.Format.Enable(True)
         self.UpdateDataPosition()
         if "pcb" in obj:
@@ -337,6 +358,7 @@ class BoardgenPanel(BasePanel):
             self.Path.ChangeValue(self.edit_path.replace(".", " -> "))
         else:
             self.Path.ChangeValue("")
+        self.UpdateEditType()
 
     @on_event
     def OnSaveClick(self) -> None:
@@ -404,6 +426,199 @@ class BoardgenPanel(BasePanel):
             # case "Delete item":
             # case "Duplicate item":
 
+    def UpdateEditType(self) -> None:
+        prev_type = self.edit_type
+        if not self.edit_item:
+            return
+        name, _ = self.edit_item
+        path = self.edit_path
+
+        self.edit_type = None
+        is_shape = (
+            name.startswith("templates")
+            and (path.startswith("front.") or path.startswith("back."))
+            or name.startswith("shapes")
+        )
+        is_vars = "vars." in path
+
+        if is_shape and path.endswith(".name"):
+            self.edit_type = EditType.SHAPE
+        elif is_shape and path.endswith(".preset"):
+            self.edit_type = EditType.PRESET
+        elif is_shape and path.endswith(".type"):
+            self.edit_type = EditType.SHAPE_TYPE
+        elif is_vars and path.endswith("_PRESET"):
+            self.edit_type = EditType.PRESET
+        elif is_vars and path.endswith("_COLOR"):
+            self.edit_type = EditType.COLOR
+        elif is_vars and ".PINTYPE" in path:
+            self.edit_type = EditType.SHAPE
+        elif path.endswith(".color"):
+            self.edit_type = EditType.COLOR
+        elif path.endswith(".lgrad.1") or path.endswith(".lgrad.3"):
+            self.edit_type = EditType.COLOR
+        elif path.endswith(".family"):
+            self.edit_type = EditType.FAMILY
+        elif path.startswith("connectivity"):
+            self.edit_type = EditType.CONNECTIVITY
+        elif path.startswith("pcb.pinout.") or path.startswith("pcb.ic."):
+            self.edit_type = EditType.ROLE
+        elif path.startswith("pcb.pinout_hidden"):
+            self.edit_type = EditType.ROLE_HIDDEN
+        elif path.startswith("flash"):
+            self.edit_type = EditType.FLASH
+        elif path.startswith("pcb.templates"):
+            self.edit_type = EditType.TEMPLATE
+        elif name.startswith("boards") and "_base" not in name:
+            self.edit_type = EditType.BASE
+
+        if self.edit_type:
+            self.Choose.Enable(True)
+            self.Choose.SetLabel(self.edit_type.name.replace("_", " ").title() + "...")
+        else:
+            self.Choose.Enable(False)
+        if self.edit_type != prev_type:
+            debug(f"Chooser type: {self.edit_type}")
+
+    @on_event
+    def OnChooseClick(self) -> None:
+        if self.edit_errors:
+            wx.MessageBox(
+                "Can't do this, the JSON has syntax errors",
+                "Error",
+                wx.OK | wx.CENTRE | wx.ICON_ERROR,
+            )
+            return
+        data = self.data
+        if data is None:
+            return
+        cursor_pos = self.Data.GetInsertionPoint()
+        path = self.edit_path
+        walk = jsonwalk(data, path)
+        if not walk:
+            return
+        parent, key = walk
+        this_value = parent[key]
+        this_dict = this_value if isinstance(this_value, dict) else parent
+        this_list = parent if isinstance(parent, list) else this_value
+        new_value: str | int | None = None
+        new_dict: dict | None = None
+        new_list: list | None = None
+
+        match self.edit_type:
+            # multiple choice
+            case EditType.BASE:
+                items = self.core.list_json("boards", recursive=True)
+                items = [i[6:] for i in items if i.startswith("_base/")]
+                items = sorted(items, key=lambda i: "_" + i if "/" not in i else i)
+                data["_base"] = self.AskMultipleChoice(
+                    title="Choose board base",
+                    items=items,
+                    selected=data.get("_base", []),
+                    sort=False,
+                )
+            case EditType.TEMPLATE:
+                items = self.core.list_json("templates")
+                items = sorted(items)
+                new_list = self.AskMultipleChoice(
+                    title="Choose PCB templates",
+                    items=items,
+                    selected=this_list,
+                )
+            case EditType.CONNECTIVITY:
+                new_list = self.AskMultipleChoice(
+                    title="Choose module connectivity options",
+                    items=["wifi", "ble"],
+                    selected=this_list,
+                    sort=False,
+                )
+            case EditType.ROLE_HIDDEN:
+                roles = self.AskMultipleChoice(
+                    title="Choose hidden pinout roles",
+                    items=[i.name for i in self.core.roles.keys()],
+                    selected=this_value.split(","),
+                    anchor=self.Choose,
+                )
+                new_value = ",".join(roles)
+            # single choice
+            case EditType.SHAPE:
+                items = self.core.list_json("templates")
+                items = sorted(items)
+                new_value = self.AskSingleChoice(
+                    title="Choose shape",
+                    items=items,
+                    selected=this_value,
+                    anchor=self.Choose,
+                )
+            case EditType.SHAPE_TYPE:
+                new_value = self.AskSingleChoice(
+                    title="Choose shape type",
+                    items=[i.name.lower() for i in self.core.shape_ctors.keys()],
+                    selected=this_value,
+                    anchor=self.Choose,
+                )
+            case EditType.PRESET:
+                new_value = self.AskSingleChoice(
+                    title="Choose shape preset",
+                    items=list(self.core.presets.keys()),
+                    selected=this_value,
+                    anchor=self.Choose,
+                )
+            case EditType.FAMILY:
+                new_value = self.AskSingleChoice(
+                    title="Choose chip family",
+                    items=[f.short_name for f in Family.get_all() if f.is_chip],
+                    selected=this_value,
+                    sort=False,
+                    anchor=self.Choose,
+                )
+            case EditType.ROLE:
+                roles = set(i.name for i in self.core.roles.keys())
+                roles.update(ROLE_DEFAULTS.keys())
+                role = self.AskSingleChoice(
+                    title="Choose pin role to add",
+                    items=list(roles),
+                    anchor=self.Choose,
+                )
+                if role not in this_dict:
+                    this_dict[role] = ROLE_DEFAULTS.get(role, "")
+            case EditType.FLASH:
+                region = self.AskSingleChoice(
+                    title="Choose flash region to add",
+                    items=list(self.core.flash.keys()),
+                    anchor=self.Choose,
+                )
+                if region in this_dict:
+                    this_dict[region] = "0x000000+0x0000"
+            # other
+            case EditType.COLOR:
+                cdata = wx.ColourData()
+                cdata.SetChooseFull(True)
+                cdata.SetChooseAlpha(False)
+                cdata.SetColour(this_value)
+                dialog = wx.ColourDialog(
+                    self,
+                    data=cdata,
+                )
+                if dialog.ShowModal() == wx.ID_OK:
+                    cdata = dialog.GetColourData()
+                    color: wx.Colour = cdata.GetColour()
+                    new_value = color.GetAsString(wx.C2S_NAME | wx.C2S_HTML_SYNTAX)
+                    new_value = new_value.replace(" ", "")
+                dialog.Destroy()
+
+        if new_value and isinstance(parent, (dict, list)):
+            parent[key] = new_value
+        if new_dict and new_dict is not this_dict:
+            this_dict.clear()
+            this_dict.update(new_dict)
+        if new_list and new_list is not this_list:
+            this_list.clear()
+            this_list += new_list
+        self.UpdateEditItem(cursor_pos)
+        self.UpdateDrawItem()
+        self.MarkModified()
+
     def AskFileName(self, value: str = "") -> str | None:
         dialog = wx.TextEntryDialog(
             self,
@@ -417,6 +632,105 @@ class BoardgenPanel(BasePanel):
         value = dialog.GetValue().strip()
         dialog.Destroy()
         return value
+
+    def AskMultipleChoice(
+        self,
+        title: str,
+        items: list[str],
+        selected: list[str],
+        sort: bool = True,
+        anchor: wx.Window = None,
+    ) -> list[str]:
+        if sort:
+            items = sorted(items)
+        choice = []
+        missing = []
+        for item in selected[::-1]:
+            if item not in items:
+                missing.insert(0, item)
+                continue
+            items.remove(item)
+            items.insert(0, item)
+
+        if anchor:
+            menu = wx.Menu()
+            for item in items:
+                menu_item: wx.MenuItem = menu.AppendCheckItem(wx.ID_ANY, item)
+                menu_item.Check(item in selected)
+            if anchor.PopupMenu(menu):
+                choice = [
+                    items[idx]
+                    for idx, item in enumerate(menu.GetMenuItems())
+                    if item.IsChecked()
+                ]
+            menu.Destroy()
+        else:
+            dialog = wx.MultiChoiceDialog(
+                self,
+                message=title,
+                caption="Choose items",
+                choices=items,
+            )
+            if selected:
+                dialog.SetSelections([items.index(i) for i in selected if i in items])
+            if dialog.ShowModal() == wx.ID_OK:
+                choice = [items[i] for i in dialog.GetSelections()]
+            dialog.Destroy()
+
+        return choice + missing if choice else selected
+
+    def AskSingleChoice(
+        self,
+        title: str,
+        items: list[str],
+        selected: str | None = None,
+        sort: bool = True,
+        anchor: wx.Window = None,
+    ) -> str:
+        if sort:
+            items = sorted(items)
+        choice = None
+
+        if anchor:
+            menu = wx.Menu()
+            if selected:
+                for item in items:
+                    menu_item: wx.MenuItem = menu.AppendRadioItem(wx.ID_ANY, item)
+                    menu_item.Check(item == selected)
+                if anchor.PopupMenu(menu):
+                    choice = next(
+                        items[idx]
+                        for idx, item in enumerate(menu.GetMenuItems())
+                        if item.IsChecked()
+                    )
+            else:
+                for item in items:
+                    menu.Append(wx.ID_ANY, item)
+                selection = anchor.GetPopupMenuSelectionFromUser(menu)
+                if selection != -1:
+                    for i, item in enumerate(items):
+                        if menu.FindItemByPosition(i).GetId() == selection:
+                            choice = item
+                            break
+            menu.Destroy()
+        else:
+            dialog = wx.SingleChoiceDialog(
+                self,
+                message=title,
+                caption="Choose items",
+                choices=items,
+            )
+            if selected in items:
+                dialog.SetSelection(items.index(selected))
+            if dialog.ShowModal() == wx.ID_OK:
+                choice = (
+                    items[dialog.GetSelection()]
+                    if dialog.GetSelection() != -1
+                    else None
+                )
+            dialog.Destroy()
+
+        return choice or selected
 
     def CreateNewFile(self, directory: str, value: dict | list) -> None:
         name = self.AskFileName()

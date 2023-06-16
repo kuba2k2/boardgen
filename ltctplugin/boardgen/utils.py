@@ -113,6 +113,22 @@ def jsonpath(s: str, p: int) -> str | None:
     return None
 
 
+def jsonwalk(obj: dict | list, path: str) -> tuple[dict | list, str | int] | None:
+    while "." in path:
+        key, _, path = path.partition(".")
+        if isinstance(obj, list) and key.isnumeric():
+            obj = obj[int(key)]
+        elif isinstance(obj, dict):
+            obj = obj[key]
+        else:
+            return None
+    if isinstance(obj, list) and path.isnumeric():
+        path = int(path)
+    elif not isinstance(obj, dict):
+        return None
+    return obj, path
+
+
 def test_jsonpath():
     json_data = """
     {

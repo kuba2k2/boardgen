@@ -126,9 +126,10 @@
             proportion="1" />
           <node
             class="wxButton"
-            label="Choose base"
+            label="Click an item..."
             var_name="button_choose"
             disabled="1"
+            size="60,-1d"
             flags="wxEXPAND" />
           <node
             class="wxButton"
