@@ -146,6 +146,8 @@ class BoardgenPanel(BasePanel):
         self.Edit = self.BindButton("button_edit", self.OnEditClick)
         self.Format = self.BindButton("button_format", self.OnFormatClick)
         self.Choose = self.BindButton("button_choose", self.OnChooseClick)
+        self.Revert = self.BindButton("button_revert", self.OnRevertClick)
+        self.Discard = self.BindButton("button_discard", self.OnDiscardClick)
         self.Modified: wx.adv.HyperlinkCtrl = self.BindWindow(
             "label_modified",
             (wx.adv.EVT_HYPERLINK, self.OnModifiedClick),
@@ -298,6 +300,7 @@ class BoardgenPanel(BasePanel):
         if cursor_pos is not None:
             self.Data.SetInsertionPoint(cursor_pos)
         self.Format.Enable(True)
+        self.Revert.Enable(item_name in self.modified)
         self.UpdateDataPosition()
         if "pcb" in obj:
             obj = obj["pcb"]
@@ -364,6 +367,8 @@ class BoardgenPanel(BasePanel):
     def OnSaveClick(self) -> None:
         self.Modified.SetLabel("Modified: 0")
         self.Save.Enable(False)
+        self.Discard.Enable(False)
+        self.Revert.Enable(False)
         if not self.modified:
             return
         for file, obj in self.modified.items():
@@ -376,6 +381,26 @@ class BoardgenPanel(BasePanel):
                 f.write("\n")
         info(f"Saved {len(self.modified)} files")
         self.modified.clear()
+
+    @on_event
+    def OnDiscardClick(self) -> None:
+        self.Modified.SetLabel("Modified: 0")
+        self.Save.Enable(False)
+        self.Discard.Enable(False)
+        self.Revert.Enable(False)
+        if not self.modified:
+            return
+        self.modified.clear()
+        self.core.clear_cache()
+        self.UpdateDrawItem()
+        self.UpdateEditItem()
+
+    @on_event
+    def OnRevertClick(self) -> None:
+        self.MarkUnmodified()
+        self.core.clear_cache()
+        self.UpdateDrawItem()
+        self.UpdateEditItem()
 
     @on_event
     def OnModifiedClick(self) -> None:
@@ -768,6 +793,20 @@ class BoardgenPanel(BasePanel):
         self.modified[file] = obj
         self.Modified.SetLabel(f"Modified: {len(self.modified)}")
         self.Save.Enable(True)
+        self.Discard.Enable(True)
+        self.Revert.Enable(True)
+
+    def MarkUnmodified(self) -> None:
+        if not self.edit_item:
+            return
+        file, obj = self.edit_item
+        if file not in self.modified:
+            return
+        self.modified.pop(file)
+        self.Modified.SetLabel(f"Modified: {len(self.modified)}")
+        self.Save.Enable(len(self.modified) > 0)
+        self.Discard.Enable(len(self.modified) > 0)
+        self.Revert.Enable(False)
 
     @property
     def vars(self) -> dict[str, str]:

@@ -104,11 +104,26 @@
 							</object>
 							<object class="sizeritem">
 								<flag>wxALL|wxEXPAND</flag>
-								<border>5</border>
+								<border>0</border>
 								<option>1</option>
-								<object class="wxButton" name="button_save">
-									<label>Save all</label>
-									<enabled>0</enabled>
+								<object class="wxBoxSizer" name="box_sizer_9">
+									<orient>wxHORIZONTAL</orient>
+									<object class="sizeritem">
+										<flag>wxALL|wxEXPAND</flag>
+										<border>5</border>
+										<object class="wxButton" name="button_save">
+											<label>Save all</label>
+											<enabled>0</enabled>
+										</object>
+									</object>
+									<object class="sizeritem">
+										<flag>wxALL|wxEXPAND</flag>
+										<border>5</border>
+										<object class="wxButton" name="button_discard">
+											<label>Discard all</label>
+											<enabled>0</enabled>
+										</object>
+									</object>
 								</object>
 							</object>
 						</object>
@@ -154,6 +169,14 @@
 						<border>5</border>
 						<object class="wxButton" name="button_format">
 							<label>Beautify</label>
+							<enabled>0</enabled>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="button_revert">
+							<label>Revert</label>
 							<enabled>0</enabled>
 						</object>
 					</object>

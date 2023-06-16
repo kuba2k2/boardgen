@@ -99,12 +99,24 @@
               var_name="label_modified"
               borders="wxTOP|wxRIGHT|wxLEFT" />
             <node
-              class="wxButton"
-              label="Save all"
-              var_name="button_save"
-              disabled="1"
+              class="wxBoxSizer"
+              var_name="box_sizer_9"
+              border_size="0"
               flags="wxEXPAND"
-              proportion="1" />
+              proportion="1">
+              <node
+                class="wxButton"
+                label="Save all"
+                var_name="button_save"
+                disabled="1"
+                flags="wxEXPAND" />
+              <node
+                class="wxButton"
+                label="Discard all"
+                var_name="button_discard"
+                disabled="1"
+                flags="wxEXPAND" />
+            </node>
           </node>
         </node>
         <node
@@ -135,6 +147,12 @@
             class="wxButton"
             label="Beautify"
             var_name="button_format"
+            disabled="1"
+            flags="wxEXPAND" />
+          <node
+            class="wxButton"
+            label="Revert"
+            var_name="button_revert"
             disabled="1"
             flags="wxEXPAND" />
         </node>

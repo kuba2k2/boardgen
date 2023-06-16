@@ -20,6 +20,9 @@ class CoreCache(ABC):
     def clear_cache(self) -> None:
         for obj in self._cache.values():
             obj.clear()
+        self._presets = None
+        self._roles = None
+        self._flash = None
 
     def get_dirs(self, type: str) -> list[str]:
         attr_name = f"_dirs_{type}"
