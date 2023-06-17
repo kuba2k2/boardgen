@@ -1,0 +1,61 @@
+[
+	{
+		"type": "rect",
+		"pos": "0,0",
+		"size": "8.5,12.7",
+		"preset": "${MASK_PRESET}"
+	},
+	{
+		"comment": "Middle cut background",
+		"type": "rect",
+		"pos": "4,10.3",
+		"size": "2.5,2.4",
+		"fill": {
+			"color": "white"
+		}
+	},
+	{
+		"comment": "Middle cut stroke top",
+		"type": "rect",
+		"pos": "3.9,10.2",
+		"size": "2.7,0.1",
+		"preset": "pcb_stroke"
+	},
+	{
+		"comment": "Middle cut stroke left",
+		"type": "rect",
+		"pos": "3.9,10.3",
+		"size": "0.1,2.4",
+		"preset": "pcb_stroke"
+	},
+	{
+		"comment": "Middle cut stroke right",
+		"type": "rect",
+		"pos": "6.5,10.3",
+		"size": "0.1,2.4",
+		"preset": "pcb_stroke"
+	},
+	{
+		"comment": "Right cut background",
+		"type": "rect",
+		"pos": "7.7,10.3",
+		"size": "0.8,2.4",
+		"fill": {
+			"color": "white"
+		}
+	},
+	{
+		"comment": "Right cut stroke top",
+		"type": "rect",
+		"pos": "7.6,10.2",
+		"size": "0.9,0.1",
+		"preset": "pcb_stroke"
+	},
+	{
+		"comment": "Right cut stroke left",
+		"type": "rect",
+		"pos": "7.6,10.3",
+		"size": "0.1,2.4",
+		"preset": "pcb_stroke"
+	}
+]

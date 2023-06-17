@@ -1,0 +1,15 @@
+[
+	{
+		"type": "rect",
+		"pos": "0,0",
+		"size": "3.5,2.6",
+		"fill": {
+			"color": "#E6E6E6"
+		},
+		"stroke": {
+			"color": "#A66B3B",
+			"width": 0.2
+		},
+		"rx": 0.2
+	}
+]
