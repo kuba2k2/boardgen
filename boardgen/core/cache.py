@@ -24,6 +24,9 @@ class CoreCache(ABC):
         self._roles = None
         self._flash = None
 
+    def remove_from_cache(self, type: str, name: str) -> None:
+        self._cache[type].pop(name, None)
+
     def get_dirs(self, type: str) -> list[str]:
         attr_name = f"_dirs_{type}"
         if not hasattr(self, attr_name):

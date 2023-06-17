@@ -1,6 +1,7 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-6-3.
 
 import json
+from copy import deepcopy
 from enum import Enum, auto
 from logging import debug, info, warning
 from os.path import abspath, join
@@ -12,11 +13,10 @@ from ltchiptool import Family
 from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event, with_event
 from ltchiptool.util.lvm import LVM
-from ltchiptool.util.obj import get
 
 from boardgen import Core, HasVars, V
 from boardgen.draw_util import draw_shapes, get_pcb_images
-from boardgen.models import Board, RoleType, Template
+from boardgen.models import Board, Template
 from boardgen.shapes import Shape, ShapeGroup
 
 from .svg import SvgPanel
@@ -77,6 +77,38 @@ ROLE_DEFAULTS: dict[str, str | int | None] = {
     "USB": "DN",
     "WAKE": 1,
 }
+SHAPE_DEFAULTS = {
+    "circle": {
+        "type": "circle",
+        "pos": "0,0",
+        "d": 1.0,
+        "fill": {
+            "color": "black",
+        },
+    },
+    "rect": {
+        "type": "rect",
+        "pos": "0,0",
+        "size": "1,1",
+        "fill": {
+            "color": "black",
+        },
+    },
+    "subshape": {
+        "id": "subshape_id_here",
+        "name": "test_pad_1mm",
+        "pos": "0,0",
+    },
+    "text": {
+        "type": "text",
+        "pos": "0,0",
+        "text": "Text",
+        "font_size": 1.0,
+        "fill": {
+            "color": "red",
+        },
+    },
+}
 
 
 class EditType(Enum):
@@ -87,7 +119,7 @@ class EditType(Enum):
     ROLE_HIDDEN = auto()
     # single choice
     SHAPE = auto()
-    SHAPE_TYPE = auto()
+    SHAPE_ADD = auto()
     PRESET = auto()
     FAMILY = auto()
     ROLE = auto()
@@ -398,7 +430,9 @@ class BoardgenPanel(BasePanel):
     @on_event
     def OnRevertClick(self) -> None:
         self.MarkUnmodified()
-        self.core.clear_cache()
+        name, _ = self.edit_item
+        item_type, _, item_name = name.partition("/")
+        self.core.remove_from_cache(item_type, item_name)
         self.UpdateDrawItem()
         self.UpdateEditItem()
 
@@ -461,7 +495,9 @@ class BoardgenPanel(BasePanel):
         self.edit_type = None
         is_shape = (
             name.startswith("templates")
-            and (path.startswith("front.") or path.startswith("back."))
+            and (path.startswith("front") or path.startswith("back"))
+            or name.startswith("boards")
+            and (path.startswith("pcb.front") or path.startswith("pcb.back"))
             or name.startswith("shapes")
         )
         is_vars = "vars." in path
@@ -470,8 +506,6 @@ class BoardgenPanel(BasePanel):
             self.edit_type = EditType.SHAPE
         elif is_shape and path.endswith(".preset"):
             self.edit_type = EditType.PRESET
-        elif is_shape and path.endswith(".type"):
-            self.edit_type = EditType.SHAPE_TYPE
         elif is_vars and path.endswith("_PRESET"):
             self.edit_type = EditType.PRESET
         elif is_vars and path.endswith("_COLOR"):
@@ -494,6 +528,8 @@ class BoardgenPanel(BasePanel):
             self.edit_type = EditType.FLASH
         elif path.startswith("pcb.templates"):
             self.edit_type = EditType.TEMPLATE
+        elif is_shape:
+            self.edit_type = EditType.SHAPE_ADD
         elif name.startswith("boards") and "_base" not in name:
             self.edit_type = EditType.BASE
 
@@ -519,6 +555,21 @@ class BoardgenPanel(BasePanel):
             return
         cursor_pos = self.Data.GetInsertionPoint()
         path = self.edit_path
+
+        if self.edit_type == EditType.SHAPE_ADD:
+            # special case for adding shapes - find the shape list
+            parts = path.split(".")
+            new_path = []
+            for part in parts:
+                if part.isnumeric():
+                    break
+                new_path.append(part)
+            if new_path:
+                path = ".".join(new_path)
+            elif isinstance(data, list):
+                # path starts with numeric value - data object is a list
+                path = parts[0]
+
         walk = jsonwalk(data, path)
         if not walk:
             return
@@ -567,7 +618,7 @@ class BoardgenPanel(BasePanel):
                 new_value = ",".join(roles)
             # single choice
             case EditType.SHAPE:
-                items = self.core.list_json("templates")
+                items = self.core.list_json("shapes")
                 items = sorted(items)
                 new_value = self.AskSingleChoice(
                     title="Choose shape",
@@ -575,13 +626,15 @@ class BoardgenPanel(BasePanel):
                     selected=this_value,
                     anchor=self.Choose,
                 )
-            case EditType.SHAPE_TYPE:
-                new_value = self.AskSingleChoice(
-                    title="Choose shape type",
+            case EditType.SHAPE_ADD:
+                shape_type = self.AskSingleChoice(
+                    title="Choose shape type to add",
                     items=[i.name.lower() for i in self.core.shape_ctors.keys()],
-                    selected=this_value,
                     anchor=self.Choose,
                 )
+                default = {"type": shape_type}
+                shape = SHAPE_DEFAULTS.get(shape_type, default)
+                this_list.append(deepcopy(shape))
             case EditType.PRESET:
                 new_value = self.AskSingleChoice(
                     title="Choose shape preset",
@@ -632,7 +685,7 @@ class BoardgenPanel(BasePanel):
                     new_value = new_value.replace(" ", "")
                 dialog.Destroy()
 
-        if new_value and isinstance(parent, (dict, list)):
+        if new_value and new_value != this_value and isinstance(parent, (dict, list)):
             parent[key] = new_value
         if new_dict and new_dict is not this_dict:
             this_dict.clear()
