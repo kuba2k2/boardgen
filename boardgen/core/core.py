@@ -222,9 +222,12 @@ class Core(CoreCache, CoreGetters):
             Side.BACK: [],
         }
         sources: list[HasId] = []
+        all_vars = dict(pcb.vars)
+        pcb.vars = all_vars
         for template_name in pcb.templates:
-            template = Template(**self.load_template(template_name))
-            template.vars |= pcb.vars
+            template = Template(**deepcopy(self.load_template(template_name)))
+            all_vars |= template.vars
+            template.vars = all_vars
             pcb.pads |= template.pads
             pcb.test_pads |= template.test_pads
             sources.append(template)

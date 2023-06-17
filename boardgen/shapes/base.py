@@ -65,7 +65,7 @@ class Shape(Model, HasId):
         # merge parent and child vars
         vars = {}
         if isinstance(parent, HasVars):
-            vars = dict(parent.vars)
+            vars |= dict(parent.vars)
         if "vars" in data:
             vars |= data["vars"]
 

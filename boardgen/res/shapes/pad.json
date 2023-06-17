@@ -1,0 +1,11 @@
+[
+	{
+		"id": "pad",
+		"type": "rect",
+		"pos": "-${W} / 2 , -${H} / 2",
+		"size": "${W} , ${H}",
+		"preset": "copper1",
+		"rx": "${R}",
+		"ry": "${R}"
+	}
+]

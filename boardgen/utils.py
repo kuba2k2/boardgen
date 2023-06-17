@@ -35,7 +35,7 @@ def var(s: str, vars: dict) -> str:
             s = s.replace(f"${{{key}}}", str(value))
         if s == s_prev:
             # no replacements made anymore
-            raise ValueError(f"Missing variables: {s}")
+            raise ValueError(f"Missing variables: {s}\nVars: {vars}")
         s_prev = s
     for match in re.findall(if_re, s):
         (var1, var2, true, false) = match

@@ -4,7 +4,9 @@
 	"width": 10,
 	"height": 10,
 	"vars": {
-		"RASTER": 2
+		"RASTER": 2,
+		"PINTYPE_VERT": "pin_vert_cast_nohole",
+		"PINTYPE_HORZ": "pin_horz_cast_nohole"
 	},
 	"front": [
 		{

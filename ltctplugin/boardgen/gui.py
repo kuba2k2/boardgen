@@ -947,7 +947,8 @@ class BoardgenPanel(BasePanel):
 
     @vars.setter
     def vars(self, value: dict[str, str]) -> None:
-        self._vars = value
+        self._vars.clear()
+        self._vars.update(value)
 
     @property
     def draw_item(self) -> str | None:

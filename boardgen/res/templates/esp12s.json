@@ -3,6 +3,12 @@
 	"title": "ESP-12S form factor",
 	"width": 16,
 	"height": 24,
+	"vars": {
+		"PINTYPE_VERT": "pin_vert_cast_nohole",
+		"RASTER": 2,
+		"RF_W": 16,
+		"RF_H": 6.1
+	},
 	"front": [
 		{
 			"comment": "PCB soldermask",
@@ -18,8 +24,7 @@
 			"repeat": 8,
 			"pos": "0,8.5",
 			"vars": {
-				"PINDIR": "left",
-				"RASTER": 2
+				"PINDIR": "left"
 			}
 		},
 		{
@@ -29,8 +34,7 @@
 			"repeat": 8,
 			"pos": "16,8.5",
 			"vars": {
-				"PINDIR": "right",
-				"RASTER": 2
+				"PINDIR": "right"
 			}
 		}
 	],
@@ -49,8 +53,7 @@
 			"repeat": 8,
 			"pos": "0,8.5",
 			"vars": {
-				"PINDIR": "left",
-				"RASTER": 2
+				"PINDIR": "left"
 			}
 		},
 		{
@@ -60,8 +63,7 @@
 			"repeat": 8,
 			"pos": "16,8.5",
 			"vars": {
-				"PINDIR": "right",
-				"RASTER": 2
+				"PINDIR": "right"
 			}
 		}
 	],

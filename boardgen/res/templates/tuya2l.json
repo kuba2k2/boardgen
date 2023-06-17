@@ -3,6 +3,13 @@
 	"title": "Tuya boards; 2L series",
 	"width": 15,
 	"height": 17.3,
+	"vars": {
+		"PINTYPE_HORZ": "pin_horz_cast_nohole",
+		"PINDIR": "down",
+		"RASTER": 2,
+		"RF_W": 15,
+		"RF_H": 5.5
+	},
 	"front": [
 		{
 			"type": "rect",
@@ -11,23 +18,17 @@
 			"preset": "${MASK_PRESET}"
 		},
 		{
+			"comment": "Pins (1-7)",
 			"name": "r_pins_horz",
 			"repeat": 7,
-			"pos": "1.5,17.3",
-			"vars": {
-				"PINDIR": "down",
-				"RASTER": 2
-			}
+			"pos": "1.5,17.3"
 		},
 		{
+			"comment": "Pin labels (1-7)",
 			"id": "pins",
 			"name": "r_labels_horz",
 			"repeat": 7,
-			"pos": "1.5,17.3",
-			"vars": {
-				"PINDIR": "down",
-				"RASTER": 2
-			}
+			"pos": "1.5,17.3"
 		},
 		{
 			"type": "text",
@@ -47,13 +48,10 @@
 			"preset": "${MASK_PRESET}"
 		},
 		{
+			"comment": "Pins (1-7)",
 			"name": "r_pins_horz",
 			"repeat": 7,
-			"pos": "1.5,17.3",
-			"vars": {
-				"PINDIR": "down",
-				"RASTER": 2
-			}
+			"pos": "1.5,17.3"
 		}
 	],
 	"pads": {
