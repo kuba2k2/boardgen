@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from enum import Enum, auto
 from logging import debug, info, warning
-from os import rename, unlink
+from os import makedirs, rename, unlink
 from os.path import abspath, basename, dirname, join
 from shutil import copyfile
 
@@ -231,7 +231,7 @@ class BoardgenPanel(BasePanel):
         match target:
             case self.DrawItem:
                 self.Svg.ClearSvg()
-                self.UpdateDrawItem(force_list=True)
+                self.UpdateDrawItem()
             case self.EditItem:
                 self.UpdateEditItem()
 
@@ -239,7 +239,7 @@ class BoardgenPanel(BasePanel):
                 # debug(f"OnUpdate({target})")
                 pass
 
-    def UpdateDrawItem(self, force_list: bool = False) -> None:
+    def UpdateDrawItem(self, force_list: bool = True) -> None:
         item = self.draw_item
         if not item:
             return
@@ -475,15 +475,50 @@ class BoardgenPanel(BasePanel):
         if not item:
             return
         label = item.GetItemLabel()
+        parent_label = None
+
+        owner_menu: wx.Menu = item.GetMenu()
+        owner_menu_parent: wx.Menu = owner_menu.GetParent()
+        if owner_menu_parent:
+            for item in owner_menu_parent.GetMenuItems():
+                if item.GetSubMenu() == owner_menu:
+                    parent_label = item.GetItemLabel()
+                    break
+
         match label:
-            case "LibreTiny directory":
+            case "LibreTiny directory" if parent_label == "Board...":
                 self.CreateNewFile("boards", self.lvm.path(), INIT_BOARD)
-            case "boardgen directory":
+            case "boardgen directory" if parent_label == "Board...":
                 self.CreateNewFile("boards", self.core.dir_base, INIT_BOARD)
+
+            case "LibreTiny directory" if parent_label == "Board base...":
+                new_name = self.AskFileName()
+                new_path = join(
+                    self.lvm.path(),
+                    "boards",
+                    "_base",
+                    f"{new_name}.json",
+                )
+                makedirs(dirname(new_path), exist_ok=True)
+                with open(new_path, "w") as f:
+                    f.write("{}\n")
+            case "boardgen directory" if parent_label == "Board base...":
+                new_name = self.AskFileName()
+                new_path = join(
+                    self.core.dir_base,
+                    "boards",
+                    "_base",
+                    f"{new_name}.json",
+                )
+                makedirs(dirname(new_path), exist_ok=True)
+                with open(new_path, "w") as f:
+                    f.write("{}\n")
+
             case "Template":
                 self.CreateNewFile("templates", self.core.dir_base, INIT_TEMPLATE)
             case "Shape":
                 self.CreateNewFile("shapes", self.core.dir_base, INIT_SHAPE)
+
             case "Rename item" | "Delete item" | "Duplicate item":
                 if self.modified:
                     wx.MessageBox("Please save the changes first", "Information")
@@ -867,7 +902,7 @@ class BoardgenPanel(BasePanel):
         self.ReloadLists()
         self.draw_item = f"{item_type}/{name}"
         self.Svg.ClearSvg()
-        self.UpdateDrawItem(force_list=True)
+        self.UpdateDrawItem()
 
     def SetError(self, e: Exception | None) -> None:
         if not e:

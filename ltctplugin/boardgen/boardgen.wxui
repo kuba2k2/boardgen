@@ -240,6 +240,19 @@
               var_name="new_board_res" />
           </node>
           <node
+            class="submenu"
+            label="Board base..."
+            var_name="submenu_3">
+            <node
+              class="wxMenuItem"
+              label="LibreTiny directory"
+              var_name="new_board_lt_2" />
+            <node
+              class="wxMenuItem"
+              label="boardgen directory"
+              var_name="new_board_res_2" />
+          </node>
+          <node
             class="wxMenuItem"
             label="Template"
             var_name="new_template" />

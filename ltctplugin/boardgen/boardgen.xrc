@@ -286,6 +286,15 @@ SYMBOL=dummy</value>
 						<label>boardgen directory</label>
 					</object>
 				</object>
+				<object class="wxMenu" name="submenu_3">
+					<label>Board base...</label>
+					<object class="wxMenuItem" name="new_board_lt_2">
+						<label>LibreTiny directory</label>
+					</object>
+					<object class="wxMenuItem" name="new_board_res_2">
+						<label>boardgen directory</label>
+					</object>
+				</object>
 				<object class="wxMenuItem" name="new_template">
 					<label>Template</label>
 				</object>
