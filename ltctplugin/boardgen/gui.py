@@ -4,7 +4,9 @@ import json
 from copy import deepcopy
 from enum import Enum, auto
 from logging import debug, info, warning
-from os.path import abspath, join
+from os import rename, unlink
+from os.path import abspath, basename, dirname, join
+from shutil import copyfile
 
 import wx
 import wx.adv
@@ -130,7 +132,7 @@ class EditType(Enum):
 
 class BoardgenPanel(BasePanel):
     file_map: dict[str, str] = None
-    draw_items: dict[str, tuple[str, str]] = None
+    draw_items: dict[str, str] = None
     draw_object: Board | list[Shape] | Shape
     edit_items: dict[str, tuple[str, dict]] = None
     edit_selection: str = None
@@ -207,15 +209,16 @@ class BoardgenPanel(BasePanel):
         pass
 
     def ReloadLists(self) -> None:
+        self.core.clear_cache()
         draw_selection = self.DrawItem.GetStringSelection()
         items = {}
 
         for board_name in self.core.list_json("boards"):
-            items[f"Board - {board_name}"] = "board", board_name
+            items[f"Board - {board_name}"] = f"boards/{board_name}"
         for template_name in self.core.list_json("templates"):
-            items[f"Template - {template_name}"] = "template", template_name
+            items[f"Template - {template_name}"] = f"templates/{template_name}"
         for shape_name in self.core.list_json("shapes"):
-            items[f"Shape - {shape_name}"] = "shape", shape_name
+            items[f"Shape - {shape_name}"] = f"shapes/{shape_name}"
 
         self.DrawItem.SetItems(sorted(items.keys()))
         self.DrawItem.SetStringSelection(draw_selection)
@@ -240,17 +243,17 @@ class BoardgenPanel(BasePanel):
         item = self.draw_item
         if not item:
             return
-        item_type, item_name = item
+        item_type, _, item_name = item.partition("/")
 
         self.edit_items = {}
         obj: dict = {}
         try:
             match item_type:
-                case "board":
+                case "boards":
                     obj = self.core.load_board(item_name, allow_cache=False)
-                case "template":
+                case "templates":
                     obj = self.core.load_template(item_name)
-                case "shape":
+                case "shapes":
                     obj = self.core.load_shape(item_name)
         except Exception as e:
             self.SetError(e)
@@ -262,10 +265,10 @@ class BoardgenPanel(BasePanel):
 
         try:
             match item_type:
-                case "board":
+                case "boards":
                     self.draw_object = self.core.get_board(item_name)
 
-                case "template":
+                case "templates":
                     front: list[Shape] = []
                     back: list[Shape] = []
                     template = Template(**obj)
@@ -285,7 +288,7 @@ class BoardgenPanel(BasePanel):
                     elif back:
                         self.draw_object = ShapeGroup.wrap(self.core, item_name, back)
 
-                case "shape":
+                case "shapes":
                     shapes: list[Shape] = []
                     for data in obj:
                         shape = self.core.build_shape(parent=parent, data=data)
@@ -322,15 +325,15 @@ class BoardgenPanel(BasePanel):
             file = abspath(file)
             self.file_map[value[0]] = file
 
-    def UpdateEditItem(self, cursor_pos: int = None) -> None:
+    def UpdateEditItem(self) -> None:
         item = self.edit_item
         if not item:
             return
         item_name, obj = item
         self.edit_selection = item_name
+        cursor_pos = self.Data.GetInsertionPoint()
         self.Data.ChangeValue(json.dumps(obj, indent=4))
-        if cursor_pos is not None:
-            self.Data.SetInsertionPoint(cursor_pos)
+        self.Data.SetInsertionPoint(cursor_pos)
         self.Format.Enable(True)
         self.Revert.Enable(item_name in self.modified)
         self.UpdateDataPosition()
@@ -474,16 +477,53 @@ class BoardgenPanel(BasePanel):
         label = item.GetItemLabel()
         match label:
             case "LibreTiny directory":
-                self.CreateNewFile(join(self.lvm.path(), "boards"), INIT_BOARD)
+                self.CreateNewFile("boards", self.lvm.path(), INIT_BOARD)
             case "boardgen directory":
-                self.CreateNewFile(join(self.core.dir_base, "boards"), INIT_BOARD)
+                self.CreateNewFile("boards", self.core.dir_base, INIT_BOARD)
             case "Template":
-                self.CreateNewFile(join(self.core.dir_base, "templates"), INIT_TEMPLATE)
+                self.CreateNewFile("templates", self.core.dir_base, INIT_TEMPLATE)
             case "Shape":
-                self.CreateNewFile(join(self.core.dir_base, "shapes"), INIT_SHAPE)
-            # case "Rename item":
-            # case "Delete item":
-            # case "Duplicate item":
+                self.CreateNewFile("shapes", self.core.dir_base, INIT_SHAPE)
+            case "Rename item" | "Delete item" | "Duplicate item":
+                if self.modified:
+                    wx.MessageBox("Please save the changes first", "Information")
+                    return
+                if not self.edit_item:
+                    return
+                draw_item = self.draw_item
+                old_path = self.file_map.get(draw_item, None)
+                if not old_path:
+                    return
+                path_dir = dirname(old_path)
+                old_name = basename(old_path).rpartition(".")[0]
+                match label:
+                    case "Rename item":
+                        new_name = self.AskFileName(old_name)
+                        if not new_name:
+                            return
+                        new_path = join(path_dir, f"{new_name}.json")
+                        rename(old_path, new_path)
+                        self.ReloadLists()
+                        self.draw_item = draw_item.replace(old_name, new_name)
+                    case "Delete item":
+                        choice = wx.MessageBox(
+                            f"Do you really want to delete '{draw_item}'?",
+                            "Are you sure?",
+                            wx.YES_NO | wx.ICON_QUESTION,
+                        )
+                        if choice != wx.YES:
+                            return
+                        unlink(old_path)
+                        self.ReloadLists()
+                        self.draw_item = self.DrawItem.GetItems()[0]
+                    case "Duplicate item":
+                        new_name = self.AskFileName(old_name)
+                        if not new_name or new_name == old_name:
+                            return
+                        new_path = join(path_dir, f"{new_name}.json")
+                        copyfile(old_path, new_path)
+                        self.ReloadLists()
+                        self.draw_item = draw_item.replace(old_name, new_name)
 
     def UpdateEditType(self) -> None:
         prev_type = self.edit_type
@@ -553,7 +593,6 @@ class BoardgenPanel(BasePanel):
         data = self.data
         if data is None:
             return
-        cursor_pos = self.Data.GetInsertionPoint()
         path = self.edit_path
 
         if self.edit_type == EditType.SHAPE_ADD:
@@ -693,7 +732,7 @@ class BoardgenPanel(BasePanel):
         if new_list and new_list is not this_list:
             this_list.clear()
             this_list += new_list
-        self.UpdateEditItem(cursor_pos)
+        self.UpdateEditItem()
         self.UpdateDrawItem()
         self.MarkModified()
 
@@ -810,7 +849,7 @@ class BoardgenPanel(BasePanel):
 
         return choice or selected
 
-    def CreateNewFile(self, directory: str, value: dict | list) -> None:
+    def CreateNewFile(self, item_type: str, directory: str, value: dict | list) -> None:
         name = self.AskFileName()
         if not name:
             return
@@ -822,12 +861,11 @@ class BoardgenPanel(BasePanel):
             value["name"] = name
             value["title"] = name
 
-        self.core.clear_cache()
-        with open(join(directory, f"{name}.json"), "w") as f:
+        with open(join(directory, item_type, f"{name}.json"), "w") as f:
             json.dump(value, f, indent="\t")
             f.write("\n")
         self.ReloadLists()
-        self.draw_item = name
+        self.draw_item = f"{item_type}/{name}"
         self.Svg.ClearSvg()
         self.UpdateDrawItem(force_list=True)
 
@@ -876,13 +914,13 @@ class BoardgenPanel(BasePanel):
         self._vars = value
 
     @property
-    def draw_item(self) -> tuple[str, str] | None:
+    def draw_item(self) -> str | None:
         return self.draw_items.get(self.DrawItem.GetStringSelection(), None)
 
     @draw_item.setter
     def draw_item(self, value: str) -> None:
         for key, item in self.draw_items.items():
-            if key == value or item[1] == value:
+            if key == value or item == value:
                 self.DrawItem.SetStringSelection(key)
                 self.UpdateDrawItem()
                 return
