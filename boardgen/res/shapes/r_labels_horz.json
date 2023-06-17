@@ -1,0 +1,12 @@
+[
+	{
+		"id": "label<${I} + 1>",
+		"name": "label_line_${PINDIR}",
+		"pos": "${RASTER} * ${I} , 0",
+		"vars": {
+			"DIR": "<'left' if (${I} < -(-${J}//2)) else 'right'>",
+			"W": "${RASTER} * <${I} if (${I} < -(-${J}//2)) else ${J} - ${I} + ${J} % 2 - 1>",
+			"H": "${RASTER} * <${I} + 1 if (${I} < -(-${J}//2)) else ${J} - ${I} + ${J} % 2>"
+		}
+	}
+]

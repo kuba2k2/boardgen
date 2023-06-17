@@ -14,21 +14,23 @@
 		{
 			"comment": "Pins (1-8)",
 			"id": "left",
-			"name": "pins_vert8_2mm_0.7mm",
-			"pos": "0,8",
+			"name": "r_pins_vert",
+			"repeat": 8,
+			"pos": "0,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "left"
+				"PINDIR": "left",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pins (9-16)",
 			"id": "right",
-			"name": "pins_vert8_2mm_0.7mm",
-			"pos": "16,8",
+			"name": "r_pins_vert",
+			"repeat": 8,
+			"pos": "16,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "right"
+				"PINDIR": "right",
+				"RASTER": 2
 			}
 		}
 	],
@@ -43,21 +45,23 @@
 		{
 			"comment": "Pins (9-16)",
 			"id": "right",
-			"name": "pins_vert8_2mm_0.7mm",
-			"pos": "0,8",
+			"name": "r_pins_vert",
+			"repeat": 8,
+			"pos": "0,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "left"
+				"PINDIR": "left",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pins (1-8)",
 			"id": "left",
-			"name": "pins_vert8_2mm_0.7mm",
-			"pos": "16,8",
+			"name": "r_pins_vert",
+			"repeat": 8,
+			"pos": "16,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "right"
+				"PINDIR": "right",
+				"RASTER": 2
 			}
 		}
 	],

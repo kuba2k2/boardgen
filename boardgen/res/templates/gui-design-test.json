@@ -1,0 +1,93 @@
+{
+	"name": "pins_test",
+	"title": "pins_test",
+	"width": 10,
+	"height": 10,
+	"vars": {
+		"RASTER": 2
+	},
+	"front": [
+		{
+			"id": "subshape_id_here",
+			"name": "r_pins_vert",
+			"repeat": 8,
+			"pos": "0,0.35",
+			"vars": {
+				"PINDIR": "left"
+			}
+		},
+		{
+			"id": "subshape_id_here",
+			"name": "r_pins_horz",
+			"repeat": 6,
+			"pos": "5,0",
+			"vars": {
+				"PINDIR": "down"
+			}
+		},
+		{
+			"id": "subshape_id_here",
+			"name": "r_labels_horz",
+			"repeat": 6,
+			"pos": "5,0",
+			"vars": {
+				"PINDIR": "down"
+			}
+		},
+		{
+			"id": "subshape_id_here",
+			"name": "r_pins_horz",
+			"repeat": 5,
+			"pos": "5,10",
+			"vars": {
+				"PINDIR": "down"
+			}
+		},
+		{
+			"id": "subshape_id_here",
+			"name": "r_labels_horz",
+			"repeat": 5,
+			"pos": "5,10",
+			"vars": {
+				"PINDIR": "down"
+			}
+		},
+		{
+			"id": "subshape_id_here",
+			"name": "r_pins_horz",
+			"repeat": 8,
+			"pos": "5,27",
+			"vars": {
+				"PINDIR": "up"
+			}
+		},
+		{
+			"id": "subshape_id_here",
+			"name": "r_labels_horz",
+			"repeat": 8,
+			"pos": "5,27",
+			"vars": {
+				"PINDIR": "up"
+			}
+		},
+		{
+			"type": "rect",
+			"pos": "0,0.35",
+			"size": "0.2,0.2",
+			"fill": {
+				"color": "red"
+			}
+		},
+		{
+			"type": "rect",
+			"pos": "5,0",
+			"size": "0.2,0.2",
+			"fill": {
+				"color": "red"
+			}
+		}
+	],
+	"back": [],
+	"pads": {},
+	"test_pads": {}
+}

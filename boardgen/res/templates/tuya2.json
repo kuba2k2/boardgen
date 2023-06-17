@@ -5,23 +5,26 @@
 	"height": 17.9,
 	"front": [
 		{
-			"name": "tuya2-pcb",
+			"name": "tuya2_pcb",
 			"pos": "0,0"
 		},
 		{
-			"name": "pads_horz5_2mm",
+			"name": "r_pins_horz",
+			"repeat": 5,
 			"pos": "3.5,16.3",
 			"vars": {
-				"PINTYPE": "pad_10x25",
-				"PINDIR": "down"
+				"PINTYPE_HORZ": "pad_10x25",
+				"RASTER": 2
 			}
 		},
 		{
 			"id": "pins",
-			"name": "labels_horz5_2mm",
-			"pos": "3.15,17.9",
+			"name": "r_labels_horz",
+			"repeat": 5,
+			"pos": "3.5,17.9",
 			"vars": {
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		},
 		{
@@ -36,23 +39,26 @@
 	],
 	"back": [
 		{
-			"name": "tuya2-pcb",
+			"name": "tuya2_pcb",
 			"pos": "0,0"
 		},
 		{
-			"name": "pads_horz6_2mm",
-			"pos": "2.45,16.3",
+			"name": "r_pins_horz",
+			"repeat": 6,
+			"pos": "2.5,16.3",
 			"vars": {
-				"PINTYPE": "pad_10x25",
-				"PINDIR": "down"
+				"PINTYPE_HORZ": "pad_10x25",
+				"RASTER": 2
 			}
 		},
 		{
 			"id": "pins",
-			"name": "labels_horz6_2mm",
-			"pos": "2.1,17.9",
+			"name": "r_labels_horz",
+			"repeat": 6,
+			"pos": "2.5,17.9",
 			"vars": {
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		}
 	],

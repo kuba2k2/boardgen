@@ -1,0 +1,22 @@
+[
+	{
+		"type": "rect",
+		"pos": "-${RASTER}*0.05 , ${RASTER}*0.1",
+		"size": "${RASTER}*0.1 , ${H}",
+		"preset": "ioline"
+	},
+	{
+		"type": "rect",
+		"pos": "<${DIR} : left : -${W} - ${RASTER}*0.15 : 0> , ${H}",
+		"size": "${W} + ${RASTER}*0.1 , ${RASTER}*0.1",
+		"preset": "ioline"
+	},
+	{
+		"type": "rect",
+		"pos": "<${DIR} : left : -${W} + ${RASTER}*0.1 : ${W} - ${RASTER}*0.15> , ${H} + ${RASTER}*0.05",
+		"id": "anchor",
+		"size": "0,0",
+		"label_dir": "${DIR}",
+		"label_size": "${RASTER}"
+	}
+]

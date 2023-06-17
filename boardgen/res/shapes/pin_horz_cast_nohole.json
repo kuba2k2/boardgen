@@ -2,15 +2,15 @@
 	{
 		"id": "trace",
 		"type": "rect",
-		"pos": "<${PINDIR} : right : -0.7 : 0> , -0.6",
-		"size": "0.7,1.2",
+		"pos": "-0.3 * ${RASTER} , <${PINDIR} : down : -0.35 * ${RASTER} : 0>",
+		"size": "0.6 * ${RASTER} , 0.35 * ${RASTER}",
 		"preset": "copper1"
 	},
 	{
 		"id": "cast",
 		"type": "circle",
 		"pos": "0,0",
-		"d": 0.7,
+		"d": "0.35 * ${RASTER}",
 		"fill": {
 			"color": "white"
 		}

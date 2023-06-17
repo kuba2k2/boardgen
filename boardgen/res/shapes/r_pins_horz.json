@@ -1,0 +1,7 @@
+[
+	{
+		"id": "pin<${I} + 1>",
+		"name": "${PINTYPE_HORZ}",
+		"pos": "${RASTER} * ${I} , 0"
+	}
+]

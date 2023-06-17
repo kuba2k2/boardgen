@@ -1,0 +1,9 @@
+[
+	{
+		"id": "pin<${I} + 1>",
+		"name": "${PINTYPE_VERT}",
+		"pos": "0 , ${RASTER} * ${I}",
+		"label_dir": "${PINDIR}",
+		"label_size": "${RASTER}"
+	}
+]

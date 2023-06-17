@@ -14,39 +14,44 @@
 		{
 			"comment": "Pins (1-7)",
 			"id": "left",
-			"name": "pins_vert7_2mm_0.7mm",
-			"pos": "0,8",
+			"name": "r_pins_vert",
+			"repeat": 7,
+			"pos": "0,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "left"
+				"PINDIR": "left",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pins (8-15)",
 			"id": "right",
-			"name": "pins_vert7_2mm_0.7mm",
-			"pos": "20,8",
+			"name": "r_pins_vert",
+			"repeat": 7,
+			"pos": "20,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "right"
+				"PINDIR": "right",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pins (16-22)",
-			"name": "pins_horz8_2mm_0.7mm",
-			"pos": "2.7,24",
+			"name": "r_pins_horz",
+			"repeat": 8,
+			"pos": "3,24",
 			"vars": {
-				"PINTYPE": "${PINTYPE_HORZ}",
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pin labels (16-22)",
 			"id": "down",
-			"name": "labels_horz8_2mm",
-			"pos": "2.7,24",
+			"name": "r_labels_horz",
+			"repeat": 8,
+			"pos": "3,24",
 			"vars": {
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		},
 		{
@@ -68,39 +73,44 @@
 		{
 			"comment": "Pins (8-15)",
 			"id": "right",
-			"name": "pins_vert7_2mm_0.7mm",
-			"pos": "0,8",
+			"name": "r_pins_vert",
+			"repeat": 7,
+			"pos": "0,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "left"
+				"PINDIR": "left",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pins (1-7)",
 			"id": "left",
-			"name": "pins_vert7_2mm_0.7mm",
-			"pos": "20,8",
+			"name": "r_pins_vert",
+			"repeat": 7,
+			"pos": "20,8.5",
 			"vars": {
-				"PINTYPE": "${PINTYPE_VERT}",
-				"PINDIR": "right"
+				"PINDIR": "right",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pins (16-22)",
-			"name": "pins_horz8_2mm_0.7mm",
-			"pos": "2.7,24",
+			"name": "r_pins_horz",
+			"repeat": 8,
+			"pos": "3,24",
 			"vars": {
-				"PINTYPE": "${PINTYPE_HORZ}",
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		},
 		{
 			"comment": "Pin labels (16-22)",
 			"id": "down",
-			"name": "labels_horz8_2mm",
-			"pos": "2.7,24",
+			"name": "r_labels_horz",
+			"repeat": 8,
+			"pos": "3,24",
 			"vars": {
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		}
 	],

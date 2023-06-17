@@ -11,19 +11,22 @@
 			"preset": "${MASK_PRESET}"
 		},
 		{
-			"name": "pins_horz7_2mm_0.7mm",
-			"pos": "1.15,17.3",
+			"name": "r_pins_horz",
+			"repeat": 7,
+			"pos": "1.5,17.3",
 			"vars": {
-				"PINTYPE": "${PINTYPE_HORZ}",
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		},
 		{
 			"id": "pins",
-			"name": "labels_horz7_2mm",
-			"pos": "1.15,17.3",
+			"name": "r_labels_horz",
+			"repeat": 7,
+			"pos": "1.5,17.3",
 			"vars": {
-				"PINDIR": "down"
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		},
 		{
@@ -33,6 +36,23 @@
 			"font_size": 1.0,
 			"fill": {
 				"color": "${SILK_COLOR}"
+			}
+		}
+	],
+	"back": [
+		{
+			"type": "rect",
+			"pos": "0,0",
+			"size": "15,17.3",
+			"preset": "${MASK_PRESET}"
+		},
+		{
+			"name": "r_pins_horz",
+			"repeat": 7,
+			"pos": "1.5,17.3",
+			"vars": {
+				"PINDIR": "down",
+				"RASTER": 2
 			}
 		}
 	],
