@@ -99,6 +99,7 @@ SHAPE_DEFAULTS = {
     "subshape": {
         "id": "subshape_id_here",
         "name": "test_pad_1mm",
+        "repeat": 1,
         "pos": "0,0",
     },
     "text": {

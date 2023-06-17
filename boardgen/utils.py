@@ -7,7 +7,8 @@ from pydantic import BaseModel
 
 from .vector import V
 
-if_re = r"<(.+?):(.+?):(.+?):(.+?)>"
+if_re = r"<([^:>]+?):([^:>]+?):([^:>]+?):([^:>]+?)>"
+eval_re = r"<([^>]+?)>"
 
 
 class Model(BaseModel):
@@ -41,6 +42,10 @@ def var(s: str, vars: dict) -> str:
         full = f"<{var1}:{var2}:{true}:{false}>"
         result = true if var1.strip() == var2.strip() else false
         s = s.replace(full, result)
+    for expr in re.findall(eval_re, s):
+        full = f"<{expr}>"
+        result = eval(expr)
+        s = s.replace(full, str(result))
     return s
 
 

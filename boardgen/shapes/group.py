@@ -9,6 +9,7 @@ from .base import Shape
 
 class ShapeGroup(Shape, HasVars):
     name: str
+    repeat: int = 1
 
     shapes: list[Shape] = []
 
@@ -24,7 +25,13 @@ class ShapeGroup(Shape, HasVars):
             self.vars = dict(parent.vars)
             self.vars |= vars
 
-        self.shapes = core.build_shapes(self.name, self, self.pos)
+        self.shapes = []
+        self.vars["J"] = self.repeat
+        for i in range(self.repeat):
+            self.vars["I"] = i
+            self.shapes += core.build_shapes(self.name, self, self.pos)
+        self.vars.pop("I", None)
+        self.vars.pop("J", None)
 
     def draw(self, dwg: Drawing):
         for shape in self.shapes:
