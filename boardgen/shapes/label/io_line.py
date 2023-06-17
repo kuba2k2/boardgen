@@ -10,7 +10,7 @@ from ..base import LabelShape
 
 class IOLine(LabelShape):
     type: IOType
-    padding: V = V(0.5, 0.5)
+    padding: V = V(0.25, 0.25)
 
     def draw(self, dwg: Drawing):
         rect = Rect(
@@ -22,4 +22,4 @@ class IOLine(LabelShape):
 
     @property
     def height(self) -> float:
-        return 0.2
+        return 0.1 * self.label_size

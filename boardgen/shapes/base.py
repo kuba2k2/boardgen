@@ -36,6 +36,13 @@ class Shape(Model, HasId):
     def draw(self, dwg: Drawing):
         raise NotImplementedError()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__post_init__()
+
+    def __post_init__(self) -> None:
+        pass
+
     @staticmethod
     def deserialize(
         core,
@@ -142,9 +149,13 @@ class Shape(Model, HasId):
 
 class LabelShape(Shape):
     role_type: RoleType
-    padding: V = V(0.1, 0.2)
+    padding: V = V(0.05, 0.1)
     ratio: float
     color: Color
+
+    def __post_init__(self) -> None:
+        if self.label_size:
+            self.padding *= self.label_size
 
     @property
     def dirv(self):

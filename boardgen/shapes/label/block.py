@@ -14,7 +14,7 @@ from ..base import LabelShape
 
 class Block(LabelShape):
     text: str
-    padding: V = V(0.1, 0.2)
+    padding: V = V(0.05, 0.1)
     radius: EvalFloat = 0.3
     angle: EvalFloat = 15
 
@@ -43,7 +43,7 @@ class Block(LabelShape):
                 text="___",
                 insert=(text_pos.x, self.y1 - self.width / 16),
                 font_family="Consolas",
-                font_size=1.2,
+                font_size=self.label_size * 0.6,
                 text_anchor="middle",
                 dominant_baseline="middle",
             )
@@ -55,7 +55,7 @@ class Block(LabelShape):
             text=text,
             insert=text_pos.tuple,
             font_family="Consolas",
-            font_size=1.2,
+            font_size=self.label_size * 0.6,
             text_anchor="middle",
             dominant_baseline="central",
         )
