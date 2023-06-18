@@ -4,7 +4,7 @@
 	"width": 15,
 	"height": 17.3,
 	"vars": {
-		"PINTYPE_HORZ": "pin_horz_cast_nohole",
+		"PINTYPE_HORZ": "pin_horz_cast_hole",
 		"PINDIR": "down",
 		"RASTER": 2,
 		"RF_W": 15,
@@ -16,6 +16,13 @@
 			"pos": "0,0",
 			"size": "15,17.3",
 			"preset": "${MASK_PRESET}"
+		},
+		{
+			"comment": "Metal shielding",
+			"type": "rect",
+			"pos": "0.7,6",
+			"size": "13.6,9",
+			"preset": "shield"
 		},
 		{
 			"comment": "Pins (1-7)",

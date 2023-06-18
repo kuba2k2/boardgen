@@ -1,0 +1,12 @@
+{
+	"name": "pcb-blue-light",
+	"title": "PCB - light blue solder mask",
+	"width": 10,
+	"height": 10,
+	"vars": {
+		"MASK_PRESET": "mask_blue_light",
+		"TRACE_COLOR": "#58839B",
+		"SILK_COLOR": "white"
+	},
+	"front": []
+}

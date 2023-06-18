@@ -16,6 +16,13 @@
 			"pos": "0,0"
 		},
 		{
+			"comment": "Metal shielding",
+			"type": "rect",
+			"pos": "0.3,6",
+			"size": "14.4,8",
+			"preset": "shield"
+		},
+		{
 			"comment": "Pins (10,8,6,4,2)",
 			"name": "r_pins_horz",
 			"repeat": 5,

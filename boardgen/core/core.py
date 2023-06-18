@@ -226,6 +226,7 @@ class Core(CoreCache, CoreGetters):
         pcb.vars = all_vars
         for template_name in pcb.templates:
             template = Template(**deepcopy(self.load_template(template_name)))
+            template.vars |= pcb.vars
             all_vars |= template.vars
             template.vars = all_vars
             pcb.pads |= template.pads

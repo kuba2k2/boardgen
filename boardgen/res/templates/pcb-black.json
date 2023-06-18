@@ -1,0 +1,12 @@
+{
+	"name": "pcb-black",
+	"title": "PCB - black solder mask",
+	"width": 10,
+	"height": 10,
+	"vars": {
+		"MASK_PRESET": "mask_black",
+		"TRACE_COLOR": "#505050",
+		"SILK_COLOR": "white"
+	},
+	"front": []
+}

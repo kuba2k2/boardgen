@@ -46,7 +46,7 @@
 		"comment": "Right cut background",
 		"type": "rect",
 		"pos": "14.2,17.5",
-		"size": "1.60,2.85",
+		"size": "1.70,2.85",
 		"fill": {
 			"color": "white"
 		}

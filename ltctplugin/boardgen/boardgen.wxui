@@ -184,7 +184,7 @@
             <node
               class="wxTextCtrl"
               style="wxTE_MULTILINE|wxTE_DONTWRAP"
-              value="MASK__PRESET=mask__blue__light&#10;TRACE__COLOR=#58839B&#10;SILK__COLOR=white&#10;PINTYPE__VERT=pin__vert__2mm__cast__nohole&#10;PINTYPE__HORZ=pin__horz__2mm__cast__nohole&#10;SYMBOL=dummy"
+              value="MASK__PRESET=mask__blue__light&#10;TRACE__COLOR=#58839B&#10;SILK__COLOR=white&#10;PINHOLE=0&#10;PINTYPE__VERT=pin__vert__cast__nohole&#10;PINTYPE__HORZ=pin__horz___cast__nohole&#10;SYMBOL=dummy"
               var_name="input_vars"
               font="Courier New,9"
               flags="wxEXPAND"

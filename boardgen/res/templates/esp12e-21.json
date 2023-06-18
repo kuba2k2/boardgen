@@ -4,8 +4,9 @@
 	"width": 16,
 	"height": 24,
 	"vars": {
-		"PINTYPE_VERT": "pin_vert_cast_nohole",
+		"PINTYPE_VERT": "pin_vert_cast_<'' if ${PINHOLE} else 'no'>hole",
 		"PINTYPE_HORZ": "pin_horz_cast_nohole",
+		"PINHOLE": 1,
 		"RASTER": 2,
 		"RF_W": 16,
 		"RF_H": 6.1
@@ -17,6 +18,13 @@
 			"pos": "0,0",
 			"size": "16,24",
 			"preset": "${MASK_PRESET}"
+		},
+		{
+			"comment": "Metal shielding",
+			"type": "rect",
+			"pos": "1.2 + 0.8 * ${PINHOLE} , 6.95",
+			"size": "13.6 - 1.6 * ${PINHOLE} , 15.8",
+			"preset": "shield"
 		},
 		{
 			"comment": "Pins (1-8)",
