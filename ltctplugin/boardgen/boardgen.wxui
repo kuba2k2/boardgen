@@ -184,7 +184,7 @@
             <node
               class="wxTextCtrl"
               style="wxTE_MULTILINE|wxTE_DONTWRAP"
-              value="MASK__PRESET=mask__blue__light&#10;TRACE__COLOR=#58839B&#10;SILK__COLOR=white&#10;PINHOLE=0&#10;PINTYPE__VERT=pin__vert__cast__nohole&#10;PINTYPE__HORZ=pin__horz___cast__nohole&#10;SYMBOL=dummy"
+              value="MASK__PRESET=mask__blue__light&#10;TRACE__COLOR=#58839B&#10;SILK__COLOR=white&#10;PINHOLE=0&#10;PINTYPE__VERT=pin__vert__cast__nohole&#10;PINTYPE__HORZ=pin__horz__cast__nohole&#10;SYMBOL=dummy"
               var_name="input_vars"
               font="Courier New,9"
               flags="wxEXPAND"
@@ -253,13 +253,31 @@
               var_name="new_board_res_2" />
           </node>
           <node
-            class="wxMenuItem"
-            label="Template"
-            var_name="new_template" />
+            class="submenu"
+            label="Template..."
+            var_name="submenu_4">
+            <node
+              class="wxMenuItem"
+              label="LibreTiny directory"
+              var_name="new_board_lt_3" />
+            <node
+              class="wxMenuItem"
+              label="boardgen directory"
+              var_name="new_board_res_3" />
+          </node>
           <node
-            class="wxMenuItem"
-            label="Shape"
-            var_name="new_shape" />
+            class="submenu"
+            label="Shape..."
+            var_name="submenu_5">
+            <node
+              class="wxMenuItem"
+              label="LibreTiny directory"
+              var_name="new_board_lt_4" />
+            <node
+              class="wxMenuItem"
+              label="boardgen directory"
+              var_name="new_board_res_4" />
+          </node>
         </node>
         <node
           class="wxMenuItem"

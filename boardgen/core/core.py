@@ -33,15 +33,18 @@ class Core(CoreCache, CoreGetters):
     def __init__(self) -> None:
         self.dir_base = join(dirname(__file__), "..", "res")
         self._dirs_boards = [
-            join(dirname(__file__), "..", "..", "..", "..", "boards"),
             join(self.dir_base, "boards"),
             "boards",
         ]
         self._dirs_shapes = [
             join(self.dir_base, "shapes"),
+            "boards/shapes",
+            "shapes",
         ]
         self._dirs_templates = [
             join(self.dir_base, "templates"),
+            "boards/templates",
+            "templates",
         ]
         self._file_presets = join(self.dir_base, "presets.json")
         self._file_roles = join(self.dir_base, "roles.json")
@@ -52,9 +55,7 @@ class Core(CoreCache, CoreGetters):
             ShapeType.SUBSHAPE: ShapeGroup,
             ShapeType.TEXT: Text,
         }
-        self.is_libretiny = isfile(
-            join(dirname(__file__), "..", "..", "..", "..", "platform.json")
-        ) or isfile("families.json")
+        self.is_libretiny = isfile("families.json")
 
     @property
     def version(self) -> str | None:

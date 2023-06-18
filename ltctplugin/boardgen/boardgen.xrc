@@ -224,7 +224,7 @@ TRACE__COLOR=#58839B
 SILK__COLOR=white
 PINHOLE=0
 PINTYPE__VERT=pin__vert__cast__nohole
-PINTYPE__HORZ=pin__horz___cast__nohole
+PINTYPE__HORZ=pin__horz__cast__nohole
 SYMBOL=dummy</value>
 									<style>wxTE_MULTILINE|wxTE_DONTWRAP</style>
 									<value>MASK__PRESET=mask__blue__light
@@ -232,7 +232,7 @@ TRACE__COLOR=#58839B
 SILK__COLOR=white
 PINHOLE=0
 PINTYPE__VERT=pin__vert__cast__nohole
-PINTYPE__HORZ=pin__horz___cast__nohole
+PINTYPE__HORZ=pin__horz__cast__nohole
 SYMBOL=dummy</value>
 									<font>
 										<size>9</size>
@@ -297,11 +297,23 @@ SYMBOL=dummy</value>
 						<label>boardgen directory</label>
 					</object>
 				</object>
-				<object class="wxMenuItem" name="new_template">
-					<label>Template</label>
+				<object class="wxMenu" name="submenu_4">
+					<label>Template...</label>
+					<object class="wxMenuItem" name="new_board_lt_3">
+						<label>LibreTiny directory</label>
+					</object>
+					<object class="wxMenuItem" name="new_board_res_3">
+						<label>boardgen directory</label>
+					</object>
 				</object>
-				<object class="wxMenuItem" name="new_shape">
-					<label>Shape</label>
+				<object class="wxMenu" name="submenu_5">
+					<label>Shape...</label>
+					<object class="wxMenuItem" name="new_board_lt_4">
+						<label>LibreTiny directory</label>
+					</object>
+					<object class="wxMenuItem" name="new_board_res_4">
+						<label>boardgen directory</label>
+					</object>
 				</object>
 			</object>
 			<object class="wxMenuItem" name="rename">

@@ -190,7 +190,11 @@ class BoardgenPanel(BasePanel):
 
         self.lvm = LVM.get()
         self.core = Core()
-        self.core.add_custom_dirs(boards=join(self.lvm.path(), "boards"))
+        self.core.add_custom_dirs(
+            boards=join(self.lvm.path(), "boards"),
+            shapes=join(self.lvm.path(), "boards", "shapes"),
+            templates=join(self.lvm.path(), "boards", "templates"),
+        )
         self.core.json_hook = self.AddEditItem
 
         self.file_map = {}
@@ -201,13 +205,29 @@ class BoardgenPanel(BasePanel):
         self.ReloadLists()
 
     def GetSettings(self) -> dict:
-        return dict()
+        return dict(
+            draw_item=self.draw_item,
+            edit_item=self.edit_item and self.edit_item[0],
+            split=self.Splitter.GetSashPosition(),
+            user_vars=self.user_vars,
+        )
 
     def SetSettings(
         self,
+        draw_item: str = None,
+        edit_item: str = None,
+        split: int = None,
+        user_vars: dict[str, str] = None,
         **_,
     ) -> None:
-        pass
+        if draw_item:
+            self.draw_item = draw_item
+        if edit_item:
+            self.edit_item = edit_item
+        if split:
+            self.Splitter.SetSashPosition(split)
+        if user_vars:
+            self.user_vars = user_vars
 
     def ReloadLists(self) -> None:
         self.core.clear_cache()
@@ -486,13 +506,13 @@ class BoardgenPanel(BasePanel):
                     parent_label = item.GetItemLabel()
                     break
 
-        match label:
-            case "LibreTiny directory" if parent_label == "Board...":
+        match parent_label, label:
+            case "Board...", "LibreTiny directory":
                 self.CreateNewFile("boards", self.lvm.path(), INIT_BOARD)
-            case "boardgen directory" if parent_label == "Board...":
+            case "Board...", "boardgen directory":
                 self.CreateNewFile("boards", self.core.dir_base, INIT_BOARD)
 
-            case "LibreTiny directory" if parent_label == "Board base...":
+            case "Board base...", "LibreTiny directory":
                 new_name = self.AskFileName()
                 new_path = join(
                     self.lvm.path(),
@@ -503,7 +523,7 @@ class BoardgenPanel(BasePanel):
                 makedirs(dirname(new_path), exist_ok=True)
                 with open(new_path, "w") as f:
                     f.write("{}\n")
-            case "boardgen directory" if parent_label == "Board base...":
+            case "Board base...", "boardgen directory":
                 new_name = self.AskFileName()
                 new_path = join(
                     self.core.dir_base,
@@ -515,12 +535,19 @@ class BoardgenPanel(BasePanel):
                 with open(new_path, "w") as f:
                     f.write("{}\n")
 
-            case "Template":
+            case "Template...", "LibreTiny directory":
+                boards_dir = join(self.lvm.path(), "boards")
+                self.CreateNewFile("templates", boards_dir, INIT_TEMPLATE)
+            case "Template...", "boardgen directory":
                 self.CreateNewFile("templates", self.core.dir_base, INIT_TEMPLATE)
-            case "Shape":
+
+            case "Shape...", "LibreTiny directory":
+                boards_dir = join(self.lvm.path(), "boards")
+                self.CreateNewFile("shapes", boards_dir, INIT_SHAPE)
+            case "Shape...", "boardgen directory":
                 self.CreateNewFile("shapes", self.core.dir_base, INIT_SHAPE)
 
-            case "Rename item" | "Delete item" | "Duplicate item":
+            case _:
                 if self.modified:
                     wx.MessageBox("Please save the changes first", "Information")
                     return
@@ -897,6 +924,7 @@ class BoardgenPanel(BasePanel):
             value["name"] = name
             value["title"] = name
 
+        makedirs(join(directory, item_type), exist_ok=True)
         with open(join(directory, item_type, f"{name}.json"), "w") as f:
             json.dump(value, f, indent="\t")
             f.write("\n")
@@ -936,12 +964,21 @@ class BoardgenPanel(BasePanel):
         self.Revert.Enable(False)
 
     @property
-    def vars(self) -> dict[str, str]:
+    def user_vars(self) -> dict[str, str]:
         lines: list[str] = self.Vars.GetValue().splitlines()
         data = {}
         for line in lines:
             key, _, value = line.strip().partition("=")
             data[key] = value
+        return data
+
+    @user_vars.setter
+    def user_vars(self, value: dict[str, str]) -> None:
+        self.Vars.SetValue("\n".join(f"{k}={v}" for k, v in value.items()))
+
+    @property
+    def vars(self) -> dict[str, str]:
+        data = self.user_vars
         data |= self._vars
         return data
 
