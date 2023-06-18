@@ -18,7 +18,7 @@ from ltchiptool.util.lvm import LVM
 
 from boardgen import Core, HasVars, V
 from boardgen.draw_util import draw_shapes, get_pcb_images
-from boardgen.models import Board, Template
+from boardgen.models import Board, RoleType, Template
 from boardgen.shapes import Shape, ShapeGroup
 
 from .svg import SvgPanel
@@ -53,8 +53,7 @@ INIT_TEMPLATE = {
 INIT_SHAPE = []
 ROLE_DEFAULTS: dict[str, str | int | None] = {
     "ADC": 0,
-    "ARD_A": "A0",
-    "ARD_D": "D0",
+    "ARD": "D0",
     "CTRL": "CEN",
     "C_NAME": "GPIO_00",
     "DVP": "PD0",
@@ -352,9 +351,11 @@ class BoardgenPanel(BasePanel):
             return
         item_name, obj = item
         self.edit_selection = item_name
+        scroll_pos = self.Data.GetScrollPos(wx.VERTICAL)
         cursor_pos = self.Data.GetInsertionPoint()
         self.Data.ChangeValue(json.dumps(obj, indent=4))
         self.Data.SetInsertionPoint(cursor_pos)
+        self.Data.SetScrollPos(wx.VERTICAL, scroll_pos)
         self.Format.Enable(True)
         self.Revert.Enable(item_name in self.modified)
         self.UpdateDataPosition()
@@ -755,20 +756,58 @@ class BoardgenPanel(BasePanel):
             case EditType.ROLE:
                 roles = set(i.name for i in self.core.roles.keys())
                 roles.update(ROLE_DEFAULTS.keys())
+                roles = sorted(roles)
+                roles.remove("IC")
+                roles.insert(0, "IC")
                 role = self.AskSingleChoice(
                     title="Choose pin role to add",
-                    items=list(roles),
+                    items=roles,
+                    sort=False,
                     anchor=self.Choose,
                 )
-                if role not in this_dict:
-                    this_dict[role] = ROLE_DEFAULTS.get(role, "")
+                if not role:
+                    return
+                role_value = ROLE_DEFAULTS.get(role, "")
+                if (
+                    role == "IC"
+                    and self.draw_item.startswith("boards/")
+                    and self.draw_object
+                    and self.draw_object.pcb
+                    and self.draw_object.pcb.ic
+                ):
+                    ic_pins = {}
+                    for ic_pin, role_map in self.draw_object.pcb.ic.items():
+                        pin_roles = []
+                        for role_type, functions in role_map.items():
+                            if role_type == RoleType.IO:
+                                continue
+                            role_obj = self.core.role(role_type)
+                            if not role_obj:
+                                continue
+                            pin_roles += role_obj.format(functions, long=False)
+                        ic_pins[" / ".join(pin_roles)] = ic_pin
+                    ic_role = self.AskSingleChoice(
+                        title="Choose pin to add",
+                        items=list(ic_pins.keys()),
+                        anchor=self.Choose,
+                    )
+                    if not ic_role:
+                        return
+                    role_value = ic_pins[ic_role]
+                ex_roles = ["PWR", "GND", "NC"]
+                for ex_role in ex_roles:
+                    if role == ex_role:
+                        this_dict.clear()
+                    else:
+                        this_dict.pop(ex_role, None)
+                this_dict[role] = role_value
             case EditType.FLASH:
                 region = self.AskSingleChoice(
                     title="Choose flash region to add",
                     items=list(self.core.flash.keys()),
                     anchor=self.Choose,
                 )
-                if region in this_dict:
+                if region not in this_dict:
                     this_dict[region] = "0x000000+0x0000"
             # other
             case EditType.COLOR:
@@ -789,10 +828,10 @@ class BoardgenPanel(BasePanel):
 
         if new_value and new_value != this_value and isinstance(parent, (dict, list)):
             parent[key] = new_value
-        if new_dict and new_dict is not this_dict:
+        elif new_dict and new_dict is not this_dict:
             this_dict.clear()
             this_dict.update(new_dict)
-        if new_list and new_list is not this_list:
+        elif new_list and new_list is not this_list:
             this_list.clear()
             this_list += new_list
         self.UpdateEditItem()
@@ -837,7 +876,7 @@ class BoardgenPanel(BasePanel):
             for item in items:
                 menu_item: wx.MenuItem = menu.AppendCheckItem(wx.ID_ANY, item)
                 menu_item.Check(item in selected)
-            if anchor.PopupMenu(menu):
+            if anchor.PopupMenu(menu, 0, 25):
                 choice = [
                     items[idx]
                     for idx, item in enumerate(menu.GetMenuItems())
@@ -877,7 +916,7 @@ class BoardgenPanel(BasePanel):
                 for item in items:
                     menu_item: wx.MenuItem = menu.AppendRadioItem(wx.ID_ANY, item)
                     menu_item.Check(item == selected)
-                if anchor.PopupMenu(menu):
+                if anchor.PopupMenu(menu, 0, 25):
                     choice = next(
                         items[idx]
                         for idx, item in enumerate(menu.GetMenuItems())
@@ -886,7 +925,7 @@ class BoardgenPanel(BasePanel):
             else:
                 for item in items:
                     menu.Append(wx.ID_ANY, item)
-                selection = anchor.GetPopupMenuSelectionFromUser(menu)
+                selection = anchor.GetPopupMenuSelectionFromUser(menu, 0, 25)
                 if selection != -1:
                     for i, item in enumerate(items):
                         if menu.FindItemByPosition(i).GetId() == selection:
