@@ -84,6 +84,11 @@ class ReadmeWriter(ReadmeParts):
         self.add_heading("Usage", 2)
         self.add_text("**Board code:**", f"`{board.id}`")
         if self.core.is_libretiny:
+            family_component_map = {
+                "realtek-amb": "rtl87xx",
+                "beken-72xx": "bk72xx",
+            }
+
             self.add_text("In `platformio.ini`:")
             code = [
                 f"[env:{board.id}]",
@@ -92,14 +97,29 @@ class ReadmeWriter(ReadmeParts):
                 "framework = arduino",
             ]
             self.add_code(code, lang="ini")
-            self.add_text("In ESPHome YAML:")
-            code = [
-                "libretiny:",
-                "  board: " + board.id,
-                "  framework:",
-                "    version: dev",
-            ]
-            self.add_code(code, lang="yaml")
+
+            component = None
+            # noinspection PyBroadException
+            try:
+                from ltchiptool import Family
+
+                family = Family.get(board.build.family)
+                for f in family.inheritance:
+                    if f.name in family_component_map:
+                        component = family_component_map[f.name]
+                        break
+            except Exception:
+                pass
+
+            if component:
+                self.add_text("In ESPHome YAML:")
+                code = [
+                    f"{component}:",
+                    "  board: " + board.id,
+                    "  framework:",
+                    "    version: dev",
+                ]
+                self.add_code(code, lang="yaml")
 
         # Pinout
         if board.pcb and board.pcb.pinout:
