@@ -48,7 +48,7 @@ MACROS_ROLES = list(PORT_SIGNALS.keys()) + [
 ]
 
 # RoleTypes not included in the variant.cpp comment lines
-ROLES_HIDDEN = ["ARD_A", "ARD_D", "IO", "C_NAME"]
+ROLES_HIDDEN = ["ARD_A", "ARD_D", "IO", "C_NAME", "PHYSICAL"]
 
 
 class VariantWriter(VariantParts):

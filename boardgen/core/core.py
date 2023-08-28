@@ -154,12 +154,15 @@ class Core(CoreCache, CoreGetters):
         ic_pins = pcb.get("ic", None) if pcb else None
 
         if pinout:
-            for roles in pinout.values():
+            for pin, roles in pinout.items():
                 roles: dict[str, RoleValue]
                 # add IC pinout mapping from board manifest
                 ic_pin = str(roles.get("IC", None))
                 if ic_pins and ic_pin in ic_pins:
                     roles |= ic_pins[ic_pin]
+                # add physical pin number, if the name is numeric
+                if pin.isnumeric():
+                    roles["PHYSICAL"] = pin
 
                 for role_type, functions in dict(roles).items():
                     if role_type == "ARD":
