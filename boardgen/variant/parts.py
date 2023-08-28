@@ -4,7 +4,6 @@ from abc import ABC
 
 from natsort import natsort_keygen
 
-from ..models import Role
 from .features import PinFeatures
 from .section import SectionType
 

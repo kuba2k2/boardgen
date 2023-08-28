@@ -3,16 +3,6 @@
 		"title": "Analog-to-Digital Converter",
 		"color": "#8AD039"
 	},
-	"ARD_A": {
-		"title": "Arduino Analog pin",
-		"color": "#16A352",
-		"ratio": 1.5
-	},
-	"ARD_D": {
-		"title": "Arduino Digital pin",
-		"color": "#99188D",
-		"ratio": 1.5
-	},
 	"CTRL": {
 		"title": "Control pin",
 		"color": "#ED602E"

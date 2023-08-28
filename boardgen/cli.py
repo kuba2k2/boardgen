@@ -121,7 +121,8 @@ def draw(
         if not board.pcb or not board.pcb.templates:
             echo(f"Skipping '{board.name}'...")
             continue
-        echo(f"Drawing '{board.name}'...")
+        svg = join(output, f"{board.id}.svg")
+        echo(f"Drawing '{board.name}' as '{svg}'...")
 
         pcb = board.pcb
 
@@ -133,10 +134,9 @@ def draw(
         images = get_pcb_images(core, pcb, labels)
         dwg = draw_shapes(px_size, scale, images, canvas)
 
-        svg = join(output, f"{board.id}.svg")
         if subdir:
             os.makedirs(join(output, board.id), exist_ok=True)
-            svg = join(output, board.id, f"pinout_{board.id}.svg")
+            svg = join(output, board.id, f"{board.id}.svg")
         with open(svg, "w", encoding="utf-8") as f:
             dwg.write(f, pretty=True, indent=4)
 

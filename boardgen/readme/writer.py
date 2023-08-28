@@ -3,6 +3,8 @@
 import os
 from os.path import dirname
 
+from natsort import natsorted
+
 from ..core import Core
 from ..models import Board
 from ..models.board import BoardDoc, BoardDocParams
@@ -116,8 +118,6 @@ class ReadmeWriter(ReadmeParts):
                 code = [
                     f"{component}:",
                     "  board: " + board.id,
-                    "  framework:",
-                    "    version: dev",
                 ]
                 self.add_code(code, lang="yaml")
 
@@ -125,68 +125,49 @@ class ReadmeWriter(ReadmeParts):
         if board.pcb and board.pcb.pinout:
             if board.pcb.templates:
                 self.add_heading("Pinout", 2)
-                self.add_img("Pinout", f"pinout_{board.id}.svg")
+                self.add_img("Pinout", f"{board.id}.svg")
 
-            if board.has_arduino_core:
-                self.add_heading("Arduino Core pin mapping", 2)
-                header = ["No.", "Pin", "UART", "I²C", "SPI", "PWM", "Other"]
-                rows = []
-                digital: dict[str, dict[RoleType, list[str]]] = {}
-                analog: dict[str, list[str]] = {}
-                roles = self.core.roles
+            self.add_heading("Pin functions", 2)
+            header = ["Name(s)", "UART", "I²C", "SPI", "PWM", "Other"]
+            rows = []
+            gpio_pins: dict[str, dict[RoleType, list[str]]] = {}
+            roles = self.core.roles
+            hidden = board.pcb.pinout_hidden.split(",")
 
-                for pin in board.pcb.pinout.values():
-                    if RoleType.ARD_D in pin:
-                        ard = pin[RoleType.ARD_D]
-                        digital[ard] = {}
-                        for role_type, functions in pin.items():
-                            if role_type not in roles:
-                                continue
-                            digital[ard][role_type] = roles[role_type].format(
-                                functions, long=True
-                            )
-                    if RoleType.ARD_A in pin:
-                        ard = pin[RoleType.ARD_A]
-                        analog[ard] = []
-                        gpio = pin.get(RoleType.GPIO, None)
-                        if gpio:
-                            analog[ard] += roles[RoleType.GPIO].format(gpio, long=True)
-                        adc = pin.get(RoleType.ADC, None)
-                        if adc:
-                            analog[ard] += roles[RoleType.ADC].format(adc, long=True)
-
-                for num in sorted(digital.keys(), key=lambda x: int(x[1:])):
-                    pin = digital[num]
-                    rows.append(
-                        [
-                            num,
-                            pin.get(RoleType.GPIO, []),
-                            pin.get(RoleType.UART, []),
-                            pin.get(RoleType.I2C, []),
-                            pin.get(RoleType.SPI, []),
-                            pin.get(RoleType.PWM, []),
-                            pin.get(RoleType.SWD, [])
-                            + pin.get(RoleType.JTAG, [])
-                            + pin.get(RoleType.DVP, []),
-                        ]
+            for pin in board.pcb.pinout.values():
+                if RoleType.GPIO not in pin:
+                    continue
+                gpio = pin[RoleType.GPIO]
+                gpio_pins[gpio] = {}
+                for role_type, functions in pin.items():
+                    if role_type not in roles:
+                        continue
+                    role_text = roles[role_type].format(
+                        functions,
+                        long=False,
+                        hidden=hidden,
                     )
-                for num in sorted(analog.keys(), key=lambda x: int(x[1:])):
-                    rows.append(
-                        [
-                            num,
-                            analog[num],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                        ]
-                    )
-                for i, row in enumerate(rows):
-                    rows[i] = [
-                        ", ".join(col) if isinstance(col, list) else col for col in row
+                    gpio_pins[gpio][role_type] = role_text
+
+            for num in natsorted(gpio_pins.keys()):
+                pin = gpio_pins[num]
+                rows.append(
+                    [
+                        pin.get(RoleType.GPIO, []) + pin.get(RoleType.ADC, []),
+                        pin.get(RoleType.UART, []),
+                        pin.get(RoleType.I2C, []),
+                        pin.get(RoleType.SPI, []),
+                        pin.get(RoleType.PWM, []),
+                        pin.get(RoleType.SWD, [])
+                        + pin.get(RoleType.JTAG, [])
+                        + pin.get(RoleType.DVP, []),
                     ]
-                self.add_table(header, *rows)
+                )
+            for i, row in enumerate(rows):
+                rows[i] = [
+                    ", ".join(col) if isinstance(col, list) else col for col in row
+                ]
+            self.add_table(header, *rows)
 
         # Flash
         if board.flash:
