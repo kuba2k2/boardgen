@@ -161,14 +161,14 @@ class BoardgenPanel(BasePanel):
 
         self.AddToNotebook("boardgen")
 
-        self.PreviewPanel: wx.Panel = self.Left.FindWindowByName("preview_panel")
+        self.PreviewPanel: wx.Panel = self.Left.FindWindowByName("preview_panel", self)
         self.PreviewBox: wx.BoxSizer = self.PreviewPanel.GetSizer()
         self.Svg = SvgPanel(self.PreviewPanel)
         self.PreviewBox.Add(self.Svg, proportion=1, flag=wx.EXPAND)
 
         self.EditItem = self.BindComboBox("combo_edit_item")
         self.DrawItem = self.BindComboBox("combo_preview_item")
-        self.Data: wx.TextCtrl = self.FindWindowByName("input_data")
+        self.Data: wx.TextCtrl = self.FindWindowByName("input_data", self)
         self.Data.Bind(wx.EVT_TEXT, self.OnDataText)
         self.Data.Bind(wx.EVT_KEY_UP, self.OnDataPosition)
         self.Data.Bind(wx.EVT_LEFT_UP, self.OnDataPosition)

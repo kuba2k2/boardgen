@@ -7,7 +7,7 @@ from natsort import natsort_keygen
 from .features import PinFeatures
 from .section import SectionType
 
-SectionItem = tuple[int, str | None]
+SectionItem = tuple[int | str, str | None] | None
 
 
 class VariantParts(ABC):
@@ -36,14 +36,20 @@ class VariantParts(ABC):
 
     def add_item(
         self,
-        section: SectionType,
+        section_type: SectionType,
         key: str,
-        value: int,
+        value: int | str,
         comment: str = None,
+        single: bool = False,
     ):
-        if section not in self.sections:
-            self.sections[section] = {}
-        self.sections[section][key] = (value, comment)
+        if section_type not in self.sections:
+            self.sections[section_type] = section = {}
+        else:
+            section = self.sections[section_type]
+        if single and key in section and section[key] and section[key][0] != value:
+            section[key] = None
+        else:
+            section[key] = (value, comment)
 
     def increment_item(self, section: SectionType, key: str):
         if section not in self.sections:
@@ -129,7 +135,7 @@ class VariantParts(ABC):
                 shift = 0
             return int(pin[1:]) + (1000 if pin[0] == "D" else 2000) + shift
 
-        natsort_key = natsort_keygen()
+        natsort_key = natsort_keygen(key=lambda x: str(x).replace("_", " "))
 
         for section_type in SectionType:
             if section_type not in self.sections:
@@ -140,19 +146,26 @@ class VariantParts(ABC):
             max_key = 0
             max_value = 0
 
-            for key, (value, _) in section:
+            for key, item in section:
+                if item is None:
+                    continue
+                (value, _) = item
                 value = str(value)
                 if key.startswith("PIN_"):
                     value = f"{value}u"
                 max_key = max(max_key, len(key))
-                max_value = max(max_value, len(value))
+                if value[0].isnumeric():
+                    max_value = max(max_value, len(value))
 
             if section_type == SectionType.ARDUINO:
                 section = sorted(section, key=sort_pins)
             elif section_type != SectionType.PINS:
                 section = sorted(section, key=natsort_key)
 
-            for key, (value, comment) in section:
+            for key, item in section:
+                if item is None:
+                    continue
+                (value, comment) = item
                 value = str(value)
                 if key.startswith("PIN_"):
                     value = f"{value}u"

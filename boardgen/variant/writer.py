@@ -126,7 +126,13 @@ class VariantWriter(VariantParts):
                     continue
                 roles_short = role.format(values, long=False, hidden=ROLES_HIDDEN)
                 for text in roles_short:
-                    self.add_item(SectionType.MACROS, f"PIN_{text}", pin_number, c_name)
+                    self.add_item(
+                        section_type=SectionType.MACROS,
+                        key=f"PIN_{text}",
+                        value=pin_number,
+                        comment=c_name,
+                        single=True,
+                    )
             pin_comment = ", ".join(pin_comment)
 
             # add the pin to the list
@@ -186,6 +192,9 @@ class VariantWriter(VariantParts):
                     else:
                         c_name = self.pins[self.gpio_map[pin_numbers[0]]][0]
                         self.add_item(section, key, pin_numbers[0], c_name)
+                    key = f"PINS_{section.name}{index}_{signal}"
+                    pins_array = ", ".join(f"{pin}u" for pin in pin_numbers)
+                    self.add_item(section, key, f"(pin_size_t[]){{{pins_array}}}")
 
         self.add_item(
             SectionType.PINS,
