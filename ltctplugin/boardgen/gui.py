@@ -366,6 +366,7 @@ class BoardgenPanel(BasePanel):
 
     def Redraw(self) -> None:
         debug(f"Draw object: {self.draw_object}")
+        scale = 12
         match self.draw_object:
             case Board():
                 images = get_pcb_images(
@@ -373,6 +374,8 @@ class BoardgenPanel(BasePanel):
                     self.draw_object.pcb,
                     with_labels=True,
                 )
+                if self.draw_object.pcb.scale:
+                    scale = self.draw_object.pcb.scale
             case list():
                 images = self.draw_object
             case Shape():
@@ -382,7 +385,7 @@ class BoardgenPanel(BasePanel):
         if not images:
             self.Svg.ClearSvg()
             return
-        dwg = draw_shapes(V(1024, 500), 12, images, with_canvas=False)
+        dwg = draw_shapes(V(1024, 500), scale, images, with_canvas=False)
         self.Svg.LoadSvg(dwg.tostring())
 
     @with_event

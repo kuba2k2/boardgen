@@ -29,16 +29,21 @@ def draw_shapes(
     dwg = Drawing(size=px_size.tuple)
 
     # stack horizontally
-    part_size = V(px_size.x / len(images), px_size.y)
-    part_pos = [V(part_size.x * i, 0) for i in range(len(images))]
+    shape_size = [shape.size for shape in images]
+    total_size = sum(s.x for s in shape_size)
+    part_size = [
+        V(px_size.x * (shape_size[i].x / total_size), px_size.y)
+        for i in range(len(images))
+    ]
+    part_pos = [V(sum(s.x for s in part_size[0:i]), 0) for i in range(len(images))]
 
     if scale:
         vb_size = px_size / scale
     else:
         scale = 99999
-        size_pad = part_size * 0.90  # 5% padding from each side
-        for shape in images:
-            size = shape.size
+        for i in range(len(images)):
+            size_pad = part_size[i] * 0.90  # 5% padding from each side
+            size = shape_size[i]
             scale = min(scale, size_pad.x / size.x, size_pad.y / size.y)
         print(" - calculated scale: %.2f" % scale)
         vb_size = px_size / scale
@@ -52,7 +57,7 @@ def draw_shapes(
         dwg.add(bg)
 
     for i, shape in enumerate(images):
-        shape_pos = ((part_size / scale) - shape.size) / 2
+        shape_pos = ((part_size[i] / scale) - shape_size[i]) / 2
         shape_pos += part_pos[i] / scale
         shape_pos -= shape.pos1
         if with_canvas:
