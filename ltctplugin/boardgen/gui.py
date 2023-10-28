@@ -68,6 +68,7 @@ ROLE_DEFAULTS: dict[str, str | int | None] = {
     "IRDA": None,
     "IRQ": None,
     "JTAG": "TMS",
+    "NC": None,
     "PHYSICAL": 2,
     "PWM": 1,
     "PWR": 3.3,
@@ -758,7 +759,11 @@ class BoardgenPanel(BasePanel):
                 roles.update(ROLE_DEFAULTS.keys())
                 roles = sorted(roles)
                 roles.remove("IC")
+                roles.remove("ARD")
                 roles.insert(0, "IC")
+                roles.insert(1, "NC")
+                roles.insert(2, "ARD")
+                roles.insert(3, "-")
                 role = self.AskSingleChoice(
                     title="Choose pin role to add",
                     items=roles,
@@ -785,7 +790,8 @@ class BoardgenPanel(BasePanel):
                             if not role_obj:
                                 continue
                             pin_roles += role_obj.format(functions, long=False)
-                        ic_pins[" / ".join(pin_roles)] = ic_pin
+                        if pin_roles:
+                            ic_pins[" / ".join(pin_roles)] = ic_pin
                     ic_role = self.AskSingleChoice(
                         title="Choose pin to add",
                         items=list(ic_pins.keys()),
