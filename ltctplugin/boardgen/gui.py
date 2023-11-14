@@ -8,15 +8,17 @@ from os import makedirs, rename, unlink
 from os.path import abspath, basename, dirname, join
 from shutil import copyfile
 
+import markdown2
 import wx
 import wx.adv
+import wx.html
 import wx.xrc
 from ltchiptool import Family
 from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event, with_event
 from ltchiptool.util.lvm import LVM
 
-from boardgen import Core, HasVars, V
+from boardgen import Core, HasVars, ReadmeWriter, V, VariantWriter
 from boardgen.draw_util import draw_shapes, get_pcb_images
 from boardgen.models import Board, RoleType, Template
 from boardgen.shapes import Shape, ShapeGroup
@@ -162,10 +164,23 @@ class BoardgenPanel(BasePanel):
 
         self.AddToNotebook("boardgen")
 
-        self.PreviewPanel: wx.Panel = self.Left.FindWindowByName("preview_panel", self)
-        self.PreviewBox: wx.BoxSizer = self.PreviewPanel.GetSizer()
-        self.Svg = SvgPanel(self.PreviewPanel)
+        self.PreviewPage: wx.NotebookPage = self.Left.FindWindowByName(
+            "preview_page", self
+        )
+        self.PreviewBox: wx.BoxSizer = self.PreviewPage.GetSizer()
+        self.Svg = SvgPanel(self.PreviewPage)
         self.PreviewBox.Add(self.Svg, proportion=1, flag=wx.EXPAND)
+
+        self.ReadmePage: wx.NotebookPage = self.Left.FindWindowByName(
+            "readme_page", self
+        )
+        self.ReadmeBox: wx.BoxSizer = self.ReadmePage.GetSizer()
+        self.Html = wx.html.HtmlWindow(self.ReadmePage)
+        # self.Html.SetStandardFonts()
+        self.ReadmeBox.Add(self.Html, proportion=1, flag=wx.EXPAND)
+
+        self.VariantH = self.BindTextCtrl("text_variant_h")
+        self.VariantC = self.BindTextCtrl("text_variant_c")
 
         self.EditItem = self.BindComboBox("combo_edit_item")
         self.DrawItem = self.BindComboBox("combo_preview_item")
@@ -367,6 +382,10 @@ class BoardgenPanel(BasePanel):
     def Redraw(self) -> None:
         debug(f"Draw object: {self.draw_object}")
         scale = 12
+        readme_html = ""
+        variant_h = ""
+        variant_c = ""
+
         match self.draw_object:
             case Board():
                 images = get_pcb_images(
@@ -376,12 +395,37 @@ class BoardgenPanel(BasePanel):
                 )
                 if self.draw_object.pcb.scale is not None:
                     scale = self.draw_object.pcb.scale
+
+                self.core.is_libretiny = True
+                readme = ReadmeWriter(self.core)
+                readme.write(board=self.draw_object)
+                readme_html = markdown2.markdown(
+                    text=readme.to_string(),
+                    extras=[
+                        "fenced-code-blocks",
+                        "tables",
+                    ],
+                )
+                readme_html = readme_html.replace("<table", "<table border=1")
+
+                writer = VariantWriter(self.core)
+                writer.generate(board=self.draw_object)
+                variant_h = writer.format_sections()
+                variant_c = writer.format_pins()
+
             case list():
                 images = self.draw_object
+
             case Shape():
                 images = [self.draw_object]
+
             case _:
                 return
+
+        self.Html.SetPage(readme_html)
+        self.VariantH.ChangeValue(variant_h)
+        self.VariantC.ChangeValue(variant_c)
+
         if not images:
             self.Svg.ClearSvg()
             return

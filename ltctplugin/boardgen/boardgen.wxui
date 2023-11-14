@@ -9,7 +9,7 @@
       class_name="PreviewPanel"
       derived_class_name="PreviewPanelDerived"
       derived_file="previewpanel_derived"
-      mockup_size="500,200">
+      mockup_size="500,500">
       <node
         class="wxBoxSizer"
         orientation="wxVERTICAL"
@@ -36,19 +36,72 @@
             flags="wxEXPAND" />
         </node>
         <node
-          class="wxStaticText"
-          label="Preview"
-          borders="wxTOP|wxRIGHT|wxLEFT" />
-        <node
-          class="wxPanel"
-          var_name="preview_panel"
-          window_style="wxTAB_TRAVERSAL"
+          class="wxNotebook"
           flags="wxEXPAND"
           proportion="1">
           <node
-            class="wxBoxSizer"
-            orientation="wxVERTICAL"
-            var_name="panel_sizer" />
+            class="BookPage"
+            label="Drawing"
+            var_name="preview_page"
+            background_colour="wxSYS_COLOUR_BTNFACE"
+            window_style="wxTAB_TRAVERSAL">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="preview_sizer" />
+          </node>
+          <node
+            class="BookPage"
+            label="Board Readme"
+            var_name="readme_page"
+            background_colour="wxSYS_COLOUR_BTNFACE"
+            window_style="wxTAB_TRAVERSAL">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="readme_sizer" />
+          </node>
+          <node
+            class="BookPage"
+            label="Variant Header"
+            var_name="variant_h_page"
+            background_colour="wxSYS_COLOUR_BTNFACE"
+            font="modern,9"
+            window_style="wxTAB_TRAVERSAL">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="variant_h_sizer">
+              <node
+                class="wxTextCtrl"
+                style="wxTE_MULTILINE|wxTE_READONLY"
+                var_name="text_variant_h"
+                font="Courier New,10"
+                borders=""
+                flags="wxEXPAND"
+                proportion="1" />
+            </node>
+          </node>
+          <node
+            class="BookPage"
+            label="Variant Code"
+            var_name="variant_c_page"
+            background_colour="wxSYS_COLOUR_BTNFACE"
+            window_style="wxTAB_TRAVERSAL">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="variant_c_sizer">
+              <node
+                class="wxTextCtrl"
+                style="wxTE_MULTILINE|wxTE_READONLY"
+                var_name="text_variant_c"
+                font="Courier New,10"
+                borders=""
+                flags="wxEXPAND"
+                proportion="1" />
+            </node>
+          </node>
         </node>
       </node>
     </node>

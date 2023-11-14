@@ -35,21 +35,81 @@
 				</object>
 			</object>
 			<object class="sizeritem">
-				<flag>wxTOP|wxRIGHT|wxLEFT</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText">
-					<label>Preview</label>
-					<wrap>-1</wrap>
-				</object>
-			</object>
-			<object class="sizeritem">
 				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
 				<option>1</option>
-				<object class="wxPanel" name="preview_panel">
-					<style>wxTAB_TRAVERSAL</style>
-					<object class="wxBoxSizer" name="panel_sizer">
-						<orient>wxVERTICAL</orient>
+				<object class="wxNotebook" name="m_notebook">
+					<object>
+						<label>Drawing</label>
+						<style>wxTAB_TRAVERSAL</style>
+						<bg>#F0F0F0</bg>
+						<object class="wxPanel" name="preview_page">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxBoxSizer" name="preview_sizer">
+								<orient>wxVERTICAL</orient>
+							</object>
+						</object>
+					</object>
+					<object>
+						<label>Board Readme</label>
+						<style>wxTAB_TRAVERSAL</style>
+						<bg>#F0F0F0</bg>
+						<object class="wxPanel" name="readme_page">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxBoxSizer" name="readme_sizer">
+								<orient>wxVERTICAL</orient>
+							</object>
+						</object>
+					</object>
+					<object>
+						<label>Variant Header</label>
+						<style>wxTAB_TRAVERSAL</style>
+						<font>
+							<size>9</size>
+							<family>modern</family>
+						</font>
+						<bg>#F0F0F0</bg>
+						<object class="wxPanel" name="variant_h_page">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxBoxSizer" name="variant_h_sizer">
+								<orient>wxVERTICAL</orient>
+								<object class="sizeritem">
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<option>1</option>
+									<object class="wxTextCtrl" name="text_variant_h">
+										<style>wxTE_MULTILINE|wxTE_READONLY</style>
+										<font>
+											<size>10</size>
+											<face>Courier New</face>
+										</font>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object>
+						<label>Variant Code</label>
+						<style>wxTAB_TRAVERSAL</style>
+						<bg>#F0F0F0</bg>
+						<object class="wxPanel" name="variant_c_page">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxBoxSizer" name="variant_c_sizer">
+								<orient>wxVERTICAL</orient>
+								<object class="sizeritem">
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<option>1</option>
+									<object class="wxTextCtrl" name="text_variant_c">
+										<style>wxTE_MULTILINE|wxTE_READONLY</style>
+										<font>
+											<size>10</size>
+											<face>Courier New</face>
+										</font>
+									</object>
+								</object>
+							</object>
+						</object>
 					</object>
 				</object>
 			</object>

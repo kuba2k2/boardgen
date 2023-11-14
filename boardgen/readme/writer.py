@@ -205,8 +205,11 @@ class ReadmeWriter(ReadmeParts):
         if board.doc.extra:
             self.items += board.doc.extra
 
+    def to_string(self) -> str:
+        return "\n\n".join(self.items)
+
     def save(self, output: str):
         os.makedirs(dirname(output), exist_ok=True)
         with open(output, "w", encoding="utf-8") as f:
-            f.write("\n\n".join(self.items))
+            f.write(self.to_string())
             f.write("\n")
