@@ -33,9 +33,9 @@ class ShapeGroup(Shape, HasVars):
         self.vars.pop("I", None)
         self.vars.pop("J", None)
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         for shape in self.shapes:
-            shape.draw(dwg)
+            shape.draw(dwg, unit)
 
     def get_by_id(self, id: str) -> Shape | None:
         for shape in self.shapes:

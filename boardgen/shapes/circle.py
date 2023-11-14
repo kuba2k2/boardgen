@@ -20,16 +20,16 @@ class Circle(Shape):
         if self.d:
             self.r = self.d / 2
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         circle = shapes.Circle(
-            center=self.pos.tuple,
-            r=self.r,
+            center=(self.pos * unit).tuple,
+            r=self.r * unit,
             id=self.fullid,
         )
         if self.fill:
-            self.fill.apply_to(dwg, circle)
+            self.fill.apply_to(dwg, circle, self, unit)
         if self.stroke:
-            self.stroke.apply_to(dwg, circle, stroke=True)
+            self.stroke.apply_to(dwg, circle, self, unit, stroke=True)
         dwg.add(circle)
 
     @property

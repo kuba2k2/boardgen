@@ -23,7 +23,11 @@ def get_pcb_images(core: Core, pcb: Pcb, with_labels: bool) -> list[Shape]:
 
 
 def draw_shapes(
-    px_size: V, scale: float | None, images: list[Shape], with_canvas: bool
+    px_size: V,
+    scale: float | None,
+    images: list[Shape],
+    with_canvas: bool,
+    rescale_viewbox: bool = True,
 ) -> Drawing:
     AutoID._set_value(1)
     dwg = Drawing(size=px_size.tuple)
@@ -48,12 +52,17 @@ def draw_shapes(
         print(" - calculated scale: %.2f" % scale)
         vb_size = px_size / scale
 
-    dwg.viewbox(width=vb_size.x, height=vb_size.y)
+    if rescale_viewbox:
+        dwg.viewbox(width=px_size.x, height=px_size.y)
+        unit = scale
+    else:
+        dwg.viewbox(width=vb_size.x, height=vb_size.y)
+        unit = 1.0
 
     if with_canvas:
-        bg = shapes.Rect(insert=(0, 0), size=vb_size.tuple)
+        bg = shapes.Rect(insert=(0, 0), size=(vb_size * unit).tuple)
         bg.fill(color="white")
-        bg.stroke(color="black", width=0.1)
+        bg.stroke(color="black", width=0.1 * unit)
         dwg.add(bg)
 
     for i, shape in enumerate(images):
@@ -63,7 +72,7 @@ def draw_shapes(
         if with_canvas:
             shape_pos.x -= 0.05
         shape.move(shape_pos)
-        shape.draw(dwg)
+        shape.draw(dwg, unit=unit)
         shape.move(-shape_pos)
 
     return dwg

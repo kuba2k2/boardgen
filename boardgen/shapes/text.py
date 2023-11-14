@@ -12,16 +12,16 @@ class Text(Shape):
     font_size: EvalFloat
     fill: FillStyle = None
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         txt = text.Text(
             text=self.text,
-            insert=self.pos.tuple,
+            insert=(self.pos * unit).tuple,
             id=self.fullid,
             font_family="Consolas",
-            font_size=self.font_size,
+            font_size=(self.font_size * unit),
         )
         if self.fill:
-            self.fill.apply_to(dwg, txt)
+            self.fill.apply_to(dwg, txt, self, unit)
         dwg.add(txt)
 
     @property

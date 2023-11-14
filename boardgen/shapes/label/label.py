@@ -84,9 +84,9 @@ class Label(LabelShape):
         for shape in self.labels:
             shape.move(vec)
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         for shape in self.labels:
-            shape.draw(dwg)
+            shape.draw(dwg, unit)
 
     @property
     def x1(self) -> float:

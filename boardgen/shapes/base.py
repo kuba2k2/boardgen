@@ -33,7 +33,7 @@ class Shape(Model, HasId):
     label_dir: LabelDir = None
     label_size: EvalFloat = None
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         raise NotImplementedError()
 
     def __init__(self, *args, **kwargs):

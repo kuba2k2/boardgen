@@ -16,21 +16,21 @@ class Rect(Shape):
     fill: FillStyle = None
     stroke: FillStyle = None
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         if self.stroke and self.stroke.width:
             self.pos += (self.stroke.width / 2, self.stroke.width / 2)
             self.size_v -= (self.stroke.width, self.stroke.width)
         rect = shapes.Rect(
-            insert=self.pos.tuple,
-            size=self.size_v.tuple,
-            rx=self.rx,
-            ry=self.ry,
+            insert=(self.pos * unit).tuple,
+            size=(self.size_v * unit).tuple,
+            rx=(self.rx or 0) * unit,
+            ry=(self.ry or 0) * unit,
             id=self.fullid,
         )
         if self.fill:
-            self.fill.apply_to(dwg, rect)
+            self.fill.apply_to(dwg, rect, self, unit)
         if self.stroke:
-            self.stroke.apply_to(dwg, rect, stroke=True)
+            self.stroke.apply_to(dwg, rect, self, unit, stroke=True)
         dwg.add(rect)
 
     @property

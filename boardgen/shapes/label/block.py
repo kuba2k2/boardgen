@@ -18,19 +18,19 @@ class Block(LabelShape):
     radius: EvalFloat = 0.3
     angle: EvalFloat = 15
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         g = Group()
         bg = Rect(
             insert=(0, 0),
-            size=self.size.tuple,
-            rx=self.radius,
-            ry=self.radius,
+            size=(self.size * unit).tuple,
+            rx=self.radius * unit,
+            ry=self.radius * unit,
         )
         bg.fill(color=self.color.as_hex())
         bg.skewX(-self.angle)
         skew_len = self.height * tan(radians(self.angle))
         g.add(bg)
-        g.translate(self.x1 + skew_len / 2, self.y1)
+        g.translate((self.x1 + skew_len / 2) * unit, self.y1 * unit)
         dwg.add(g)
 
         text = self.text
@@ -41,9 +41,9 @@ class Block(LabelShape):
             text = text[1:]
             negation_line = Text(
                 text="___",
-                insert=(text_pos.x, self.y1 - self.width / 16),
+                insert=(text_pos.x * unit, (self.y1 - self.width / 16) * unit),
                 font_family="Consolas",
-                font_size=self.label_size * 0.6,
+                font_size=self.label_size * 0.6 * unit,
                 text_anchor="middle",
                 dominant_baseline="middle",
             )
@@ -53,9 +53,9 @@ class Block(LabelShape):
 
         txt = Text(
             text=text,
-            insert=text_pos.tuple,
+            insert=(text_pos * unit).tuple,
             font_family="Consolas",
-            font_size=self.label_size * 0.6,
+            font_size=self.label_size * 0.6 * unit,
             text_anchor="middle",
             dominant_baseline="central",
         )

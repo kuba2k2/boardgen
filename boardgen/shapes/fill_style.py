@@ -20,6 +20,7 @@ class FillStyle(Model):
         dwg: Drawing,
         el: Presentation,
         shape: Shape,
+        unit: float = 1.0,
         stroke: bool = False,
     ):
         color = None
@@ -36,8 +37,8 @@ class FillStyle(Model):
                     self.lgrad[i].x += pos1.x
                     self.lgrad[i].y += pos1.y
             grad = LinearGradient(
-                start=self.lgrad[0].tuple,
-                end=self.lgrad[2].tuple,
+                start=(self.lgrad[0] * unit).tuple,
+                end=(self.lgrad[2] * unit).tuple,
                 gradientUnits="userSpaceOnUse",
             )
             grad.add_stop_color(offset="0%", color=self.lgrad[1])
@@ -48,6 +49,6 @@ class FillStyle(Model):
             if stroke:
                 if not self.width:
                     raise ValueError("No stroke width")
-                el.stroke(color=color, width=self.width)
+                el.stroke(color=color, width=self.width * unit)
             else:
                 el.fill(color=color)

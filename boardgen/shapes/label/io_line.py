@@ -12,10 +12,10 @@ class IOLine(LabelShape):
     type: IOType
     padding: V = V(0.25, 0.25)
 
-    def draw(self, dwg: Drawing):
+    def draw(self, dwg: Drawing, unit: float = 1.0):
         rect = Rect(
-            insert=self.pos1.tuple,
-            size=self.size.tuple,
+            insert=(self.pos1 * unit).tuple,
+            size=(self.size * unit).tuple,
         )
         rect.fill(color=self.color.as_hex())
         dwg.add(rect)
