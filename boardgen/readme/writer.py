@@ -42,9 +42,12 @@ class ReadmeWriter(ReadmeParts):
 
         # Specifications
         header = ["Parameter", "Value"]
+        mcu = board.build.mcu.upper()
+        if board.doc.mcu and board.doc.mcu.upper() != mcu:
+            mcu += f" ({board.doc.mcu.upper()})"
         rows = [
             ["Board code", f"`{board.id}`"],
-            ["MCU", board.build.mcu.upper()],
+            ["MCU", mcu],
         ]
         if board.doc.params.manufacturer:
             rows.append(["Manufacturer", board.doc.params.manufacturer])

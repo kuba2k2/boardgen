@@ -60,6 +60,7 @@ class BoardDoc(Model):
     links: dict[str, str] = None
     extra: list[str] = None
     fccid: str = None
+    mcu: str = None
 
 
 class BoardDocParams(Model):
