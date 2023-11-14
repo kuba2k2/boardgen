@@ -386,7 +386,7 @@ class BoardgenPanel(BasePanel):
             self.Svg.ClearSvg()
             return
         dwg = draw_shapes(V(1024, 500), scale, images, with_canvas=False)
-        self.Svg.LoadSvg(dwg.tostring())
+        self.Svg.LoadSvg(dwg)
 
     @with_event
     def OnDataText(self, event: wx.Event) -> None:
