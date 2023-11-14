@@ -25,6 +25,7 @@ from boardgen.shapes import Shape, ShapeGroup
 
 from .svg import SvgPanel
 from .utils import jsonpath, jsonwalk
+from .work import LtciThread
 
 INIT_BOARD = {
     "_base": [],
@@ -184,7 +185,7 @@ class BoardgenPanel(BasePanel):
 
         self.EditItem = self.BindComboBox("combo_edit_item")
         self.DrawItem = self.BindComboBox("combo_preview_item")
-        self.Data: wx.TextCtrl = self.FindWindowByName("input_data", self)
+        self.Data = self.BindTextCtrl("input_data")
         self.Data.Bind(wx.EVT_TEXT, self.OnDataText)
         self.Data.Bind(wx.EVT_KEY_UP, self.OnDataPosition)
         self.Data.Bind(wx.EVT_LEFT_UP, self.OnDataPosition)
@@ -198,6 +199,7 @@ class BoardgenPanel(BasePanel):
         self.Choose = self.BindButton("button_choose", self.OnChooseClick)
         self.Revert = self.BindButton("button_revert", self.OnRevertClick)
         self.Discard = self.BindButton("button_discard", self.OnDiscardClick)
+        self.Ltci = self.BindButton("button_ltci", self.OnLtciClick)
         self.Modified: wx.adv.HyperlinkCtrl = self.BindWindow(
             "label_modified",
             (wx.adv.EVT_HYPERLINK, self.OnModifiedClick),
@@ -508,6 +510,10 @@ class BoardgenPanel(BasePanel):
         self.core.remove_from_cache(item_type, item_name)
         self.UpdateDrawItem()
         self.UpdateEditItem()
+
+    @on_event
+    def OnLtciClick(self) -> None:
+        self.StartWork(LtciThread())
 
     @on_event
     def OnModifiedClick(self) -> None:

@@ -227,6 +227,13 @@
 					<object class="sizeritem">
 						<flag>wxALL|wxEXPAND</flag>
 						<border>5</border>
+						<object class="wxButton" name="button_ltci">
+							<label>boardgen ltci</label>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
 						<object class="wxButton" name="button_format">
 							<label>Beautify</label>
 							<enabled>0</enabled>

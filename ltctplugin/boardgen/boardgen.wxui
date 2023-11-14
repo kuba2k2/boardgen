@@ -198,6 +198,11 @@
             flags="wxEXPAND" />
           <node
             class="wxButton"
+            label="boardgen ltci"
+            var_name="button_ltci"
+            flags="wxEXPAND" />
+          <node
+            class="wxButton"
             label="Beautify"
             var_name="button_format"
             disabled="1"
