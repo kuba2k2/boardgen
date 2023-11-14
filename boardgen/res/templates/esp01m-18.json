@@ -1,0 +1,87 @@
+{
+	"name": "esp01m-18",
+	"title": "ESP-01M form factor (18-pin)",
+	"width": 18,
+	"height": 18,
+	"vars": {
+		"PINTYPE_HORZ": "pad_10x25",
+		"PINDIR": "down",
+		"RASTER": 1.6,
+		"RF_W": 18,
+		"RF_H": 5.5
+	},
+	"front": [
+		{
+			"name": "esp01m",
+			"pos": "0,0"
+		},
+		{
+			"comment": "Metal shielding",
+			"type": "rect",
+			"pos": "0.3,6",
+			"size": "17.4,8",
+			"preset": "shield"
+		},
+		{
+			"comment": "Pins (9..1)",
+			"name": "r_pins_horz",
+			"repeat": 9,
+			"pos": "2.6,16.4"
+		},
+		{
+			"comment": "Pin labels (9..1)",
+			"id": "pins",
+			"name": "r_labels_horz",
+			"repeat": 9,
+			"pos": "2.6,18"
+		},
+		{
+			"type": "text",
+			"pos": "7.5,5.5",
+			"text": "${SYMBOL}",
+			"font_size": 1.0,
+			"fill": {
+				"color": "${SILK_COLOR}"
+			}
+		}
+	],
+	"back": [
+		{
+			"name": "esp01m",
+			"pos": "0,0"
+		},
+		{
+			"comment": "Pins (18..10)",
+			"name": "r_pins_horz",
+			"repeat": 9,
+			"pos": "2.6,16.4"
+		},
+		{
+			"comment": "Pin labels (18..10)",
+			"id": "pins",
+			"name": "r_labels_horz",
+			"repeat": 9,
+			"pos": "2.6,18"
+		}
+	],
+	"pads": {
+		"1": "esp01m-18.front.pins.label9.anchor",
+		"2": "esp01m-18.front.pins.label8.anchor",
+		"3": "esp01m-18.front.pins.label7.anchor",
+		"4": "esp01m-18.front.pins.label6.anchor",
+		"5": "esp01m-18.front.pins.label5.anchor",
+		"6": "esp01m-18.front.pins.label4.anchor",
+		"7": "esp01m-18.front.pins.label3.anchor",
+		"8": "esp01m-18.front.pins.label2.anchor",
+		"9": "esp01m-18.front.pins.label1.anchor",
+		"10": "esp01m-18.back.pins.label9.anchor",
+		"11": "esp01m-18.back.pins.label8.anchor",
+		"12": "esp01m-18.back.pins.label7.anchor",
+		"13": "esp01m-18.back.pins.label6.anchor",
+		"14": "esp01m-18.back.pins.label5.anchor",
+		"15": "esp01m-18.back.pins.label4.anchor",
+		"16": "esp01m-18.back.pins.label3.anchor",
+		"17": "esp01m-18.back.pins.label2.anchor",
+		"18": "esp01m-18.back.pins.label1.anchor"
+	}
+}
