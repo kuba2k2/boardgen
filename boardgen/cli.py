@@ -127,7 +127,10 @@ def draw(
         pcb = board.pcb
 
         if scale_arg is None:
-            scale = pcb.scale or 12
+            if pcb.scale is None:
+                scale = 12
+            else:
+                scale = pcb.scale
         else:
             scale = scale_arg
 

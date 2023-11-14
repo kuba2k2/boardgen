@@ -14,7 +14,7 @@ PinDict = dict[RoleType, list[str] | str | int | float | None]
 class Pcb(Model, HasId, HasVars):
     symbol: str
     templates: list[str]
-    scale: float = 0
+    scale: float | None = None
     ic: dict[int, PinDict] = {}
     front: list[dict] = []
     back: list[dict] = []

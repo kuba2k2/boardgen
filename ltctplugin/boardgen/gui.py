@@ -374,7 +374,7 @@ class BoardgenPanel(BasePanel):
                     self.draw_object.pcb,
                     with_labels=True,
                 )
-                if self.draw_object.pcb.scale:
+                if self.draw_object.pcb.scale is not None:
                     scale = self.draw_object.pcb.scale
             case list():
                 images = self.draw_object
