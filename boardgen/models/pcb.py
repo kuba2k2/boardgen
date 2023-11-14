@@ -22,12 +22,13 @@ class Pcb(Model, HasId, HasVars):
     test_pads: dict[str, str] = {}
     pinout: dict[str, PinDict] = {}
     pinout_hidden: str = ""
+    drawing_hidden: str = ""
 
     shapes: dict[Side, ShapeGroup] = {}
 
     def get_pos(self, side: Side) -> tuple[V, V]:
         shape = self.shapes[side]
-        return (shape.pos1, shape.pos2)
+        return shape.pos1, shape.pos2
 
     def get_size(self, side: Side) -> V:
         shape = self.shapes[side]

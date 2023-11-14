@@ -630,7 +630,7 @@ class BoardgenPanel(BasePanel):
             self.edit_type = EditType.CONNECTIVITY
         elif path.startswith("pcb.pinout.") or path.startswith("pcb.ic."):
             self.edit_type = EditType.ROLE
-        elif path.startswith("pcb.pinout_hidden"):
+        elif path.startswith("pcb.") and path.endswith("_hidden"):
             self.edit_type = EditType.ROLE_HIDDEN
         elif path.startswith("flash"):
             self.edit_type = EditType.FLASH
@@ -869,6 +869,8 @@ class BoardgenPanel(BasePanel):
         sort: bool = True,
         anchor: wx.Window = None,
     ) -> list[str]:
+        items = [i for i in items if i]
+        selected = [i for i in selected if i]
         if sort:
             items = sorted(items)
         choice = []
@@ -915,6 +917,7 @@ class BoardgenPanel(BasePanel):
         sort: bool = True,
         anchor: wx.Window = None,
     ) -> str:
+        items = [i for i in items if i]
         if sort:
             items = sorted(items)
         choice = None

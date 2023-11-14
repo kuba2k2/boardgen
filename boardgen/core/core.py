@@ -256,7 +256,7 @@ class Core(CoreCache, CoreGetters):
         pads = pcb.pads
         pads |= pcb.test_pads
         pins = pcb.pinout
-        hidden = pcb.pinout_hidden.split(",")
+        hidden = pcb.pinout_hidden.split(",") + pcb.drawing_hidden.split(",")
 
         x1, y1, x2, y2 = (None, None, None, None)
         labels: list[Label] = []
