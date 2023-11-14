@@ -17,7 +17,7 @@ class V:
     x: float
     y: float
 
-    def __init__(self, x=0, y=0):
+    def __init__(self, x=0.0, y=0.0):
         self.x = 0
         self.y = 0
         if isinstance(x, tuple) or isinstance(x, list):
@@ -68,7 +68,7 @@ class V:
 
     @property
     def tuple(self) -> tuple[float, float]:
-        return (self.x, self.y)
+        return self.x, self.y
 
     @property
     def int(self) -> "V":
