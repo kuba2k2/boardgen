@@ -1,5 +1,7 @@
 # Copyright (c) Kuba Szczodrzyński 2022-05-11.
 
+import re
+
 from pydantic.color import Color
 
 from ..utils import Model
@@ -32,8 +34,13 @@ class Role(Model):
     ratio: float = 1.8
 
     def format(
-        self, functions: RoleValue, long: bool = False, hidden: list[str] = []
+        self,
+        functions: RoleValue,
+        long: bool = False,
+        hidden: list[str] = None,
+        safe: bool = False,
     ) -> list[str]:
+        hidden = hidden or []
         # force a list
         if not isinstance(functions, list):
             if not functions:
@@ -74,5 +81,7 @@ class Role(Model):
             # remove hidden roles
             if self.role_type.name in hidden or function in hidden:
                 continue
+            if safe:
+                function = re.sub(r"[^A-Za-z0-9_]", "", function)
             out.append(function)
         return out

@@ -124,7 +124,9 @@ class VariantWriter(VariantParts):
                 pin_comment += role.format(values, long=True, hidden=ROLES_HIDDEN)
                 if role_type not in MACROS_ROLES:
                     continue
-                roles_short = role.format(values, long=False, hidden=ROLES_HIDDEN)
+                roles_short = role.format(
+                    values, long=False, hidden=ROLES_HIDDEN, safe=True
+                )
                 for text in roles_short:
                     self.add_item(
                         section_type=SectionType.MACROS,
@@ -161,10 +163,12 @@ class VariantWriter(VariantParts):
                     roles = [str(roles)]
                 for role in roles:
                     # require "1_RX" format
-                    if not role[0].isnumeric() or role[1] != "_":
-                        continue
                     (index, _, port) = role.partition("_")
-                    index = int(index)
+                    if index and port and index.isnumeric():
+                        index = int(index)
+                    else:
+                        index = 0
+                        port = role
                     if index not in ports[role_type]:
                         ports[role_type][index] = {}
                     if port not in ports[role_type][index]:
